@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebsiteBuilder Framework Demo</title>
+</head>
+
+<script src="builder.js"></script>
+
+<body>
+    <script>
+        // ============================================
+        // DEMO WEBSITE USING YOUR EXACT SYNTAX
+        // ============================================
+
+        const website = new Website({
+            smoothScrolling: true,
+            defaultPage: "home"
+        });
+
+        const page = new Page("home");
+
+        page.add(new NavBar({
+            style: "default",
+            logo: "🚀 MyBrand",
+            links: [
+                {
+                    title: "Home",
+                    href: "#"
+                },
+                {
+                    title: "Features",
+                    href: "#features-section"
+                },
+                {
+                    title: "Testimonials",
+                    href: "#testimonials-section"
+                }
+            ]
+        }));
+
+        page.add(new HeroBanner("Welcome to Our Amazing Platform!", {
+            subtitle: "Build beautiful websites with ease using our powerful framework",
+            bgColor: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            buttonsPlacement: "right",
+            buttons: [
+                {
+                    title: "Get Started",
+                    link: "#features-section",
+                    primary: true
+                },
+                {
+                    title: "Learn More",
+                    link: "#testimonials-section"
+                }
+            ]
+        }));
+
+        page.add(new FeatureGrid("Our Amazing Features", {
+            id: "features-section",
+            items: [
+                {
+                    icon: "⚡",
+                    title: "Lightning Fast",
+                    description: "Built with performance in mind. Your websites will load in milliseconds."
+                },
+                {
+                    icon: "🎨",
+                    title: "Beautiful Design",
+                    description: "Pre-designed components that look great out of the box."
+                },
+                {
+                    icon: "📱",
+                    title: "Fully Responsive",
+                    description: "Works perfectly on all devices, from mobile to desktop."
+                },
+                {
+                    icon: "🔧",
+                    title: "Easy to Customize",
+                    description: "Simple API that lets you customize everything to your needs."
+                },
+                {
+                    icon: "🚀",
+                    title: "Quick Setup",
+                    description: "Get started in minutes with our intuitive framework."
+                },
+                {
+                    icon: "💎",
+                    title: "Premium Quality",
+                    description: "Professional-grade components built with best practices."
+                }
+            ]
+        }));
+
+        page.add(new Testimonials("Here is what people say about us", {
+            id: "testimonials-section",
+            items: [
+                {
+                    clientName: "John Smith",
+                    grade: 5,
+                    comment: "This framework saved me hours of development time. The components are beautiful and easy to use!"
+                },
+                {
+                    clientName: "Marc Johnson",
+                    grade: 4,
+                    comment: "Great tool for quickly building landing pages. Love the simple API and clean design."
+                },
+                {
+                    clientName: "Sarah Williams",
+                    grade: 5,
+                    comment: "The best website builder framework I've used. Highly customizable and the code is very clean."
+                }
+            ]
+        }));
+
+        page.add(new Footer({
+            copyright: "© 2025 MyBrand. All rights reserved.",
+            links: [
+                { title: "Privacy Policy", href: "#" },
+                { title: "Terms of Service", href: "#" },
+                { title: "Contact", href: "#" }
+            ],
+            social: [
+                { name: "Twitter", link: "https://twitter.com" },
+                { name: "GitHub", link: "https://github.com" },
+                { name: "LinkedIn", link: "https://linkedin.com" }
+            ]
+        }));
+
+        website.add(page);
+        website.display();
+    </script>
+</body>
+</html>

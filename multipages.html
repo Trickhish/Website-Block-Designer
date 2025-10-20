@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebsiteBuilder Framework - Multi-Page Demo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        .page-nav {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            z-index: 999;
+            transition: all 0.3s;
+        }
+        .page-nav button {
+            display: block;
+            width: 100%;
+            margin: 0.25rem 0;
+            padding: 0.5rem 1rem;
+            border: none;
+            background: var(--bg-alt);
+            color: var(--text-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .page-nav button:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        .page-nav button.active {
+            background: var(--primary-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Navigation -->
+    <div class="page-nav">
+        <button onclick="showPage('home')" class="active" id="nav-home">Home</button>
+        <button onclick="showPage('about')" id="nav-about">About</button>
+        <button onclick="showPage('services')" id="nav-services">Services</button>
+        <button onclick="showPage('portfolio')" id="nav-portfolio">Portfolio</button>
+        <button onclick="showPage('pricing')" id="nav-pricing">Pricing</button>
+        <button onclick="showPage('contact')" id="nav-contact">Contact</button>
+    </div>
+
+    <script src="builder.js"></script>
+    <script>
+        // Create website instance
+        const website = new Website({
+            smoothScrolling: true,
+            defaultPage: 'home',
+            darkMode: false
+        });
+
+        // HOME PAGE
+        const homePage = new Page('home');
+        
+        homePage.add(new NavBar({
+            logo: "WebBuilder",
+            logoSize: "large",
+            themeToggle: true,
+            links: [
+                { title: "Home", href: "#" },
+                { title: "About", href: "#about" },
+                { title: "Services", href: "#services" },
+                { title: "Contact", href: "#contact" }
+            ]
+        }));
+
+        homePage.add(new HeroBanner("Build Amazing Websites", {
+            subtitle: "Create beautiful, responsive websites with our component-based framework",
+            bgColor: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            height: "100vh",
+            buttons: [
+                { title: "Get Started", link: "#features", primary: true },
+                { title: "Learn More", link: "#about", primary: false }
+            ]
+        }));
+
+        homePage.add(new FeatureGrid("Why Choose WebBuilder?", {
+            id: "features",
+            items: [
+                {
+                    icon: "⚡",
+                    title: "Lightning Fast",
+                    description: "Built with vanilla JavaScript for optimal performance and zero dependencies."
+                },
+                {
+                    icon: "🎨",
+                    title: "Beautiful Design",
+                    description: "Pre-styled components with dark mode support and smooth animations."
+                },
+                {
+                    icon: "📱",
+                    title: "Fully Responsive",
+                    description: "Mobile-first design that looks great on all devices and screen sizes."
+                },
+                {
+                    icon: "🔧",
+                    title: "Easy to Use",
+                    description: "Simple, declarative API that lets you build websites in minutes, not hours."
+                },
+                {
+                    icon: "🎯",
+                    title: "Component Based",
+                    description: "Reusable sections like hero banners, testimonials, pricing tables and more."
+                },
+                {
+                    icon: "🌙",
+                    title: "Theme Support",
+                    description: "Built-in light and dark modes with automatic theme detection."
+                }
+            ]
+        }));
+
+        homePage.add(new Testimonials("What Our Users Say", {
+            items: [
+                {
+                    clientName: "Sarah Johnson",
+                    grade: 5,
+                    comment: "WebBuilder made it incredibly easy to create a professional website. The components are beautiful and the dark mode is fantastic!"
+                },
+                {
+                    clientName: "Mike Chen",
+                    grade: 5,
+                    comment: "I built my portfolio site in under an hour. The framework is intuitive and the results look amazing."
+                },
+                {
+                    clientName: "Emma Davis",
+                    grade: 4,
+                    comment: "Great framework for rapid prototyping. The pricing table component saved me so much time."
+                }
+            ]
+        }));
+
+        homePage.add(new Footer({
+            copyright: "© 2024 WebBuilder Framework. All rights reserved.",
+            links: [
+                { title: "Documentation", href: "#" },
+                { title: "GitHub", href: "#" },
+                { title: "Support", href: "#" }
+            ],
+            social: [
+                { name: "Twitter", link: "#" },
+                { name: "GitHub", link: "#" },
+                { name: "Discord", link: "#" }
+            ]
+        }));
+
+        // ABOUT PAGE
+        const aboutPage = new Page('about');
+        
+        aboutPage.add(new NavBar({
+            logo: "WebBuilder",
+            logoSize: "large",
+            themeToggle: true,
+            links: [
+                { title: "Home", href: "#" },
+                { title: "About", href: "#about" },
+                { title: "Services", href: "#services" },
+                { title: "Contact", href: "#contact" }
+            ]
+        }));
+
+        aboutPage.add(new HeroBanner("About WebBuilder", {
+            subtitle: "The story behind our mission to simplify web development",
+            bgColor: "#2c3e50",
+            height: "60vh"
+        }));
+
+        aboutPage.add(new FeatureGrid("Our Mission", {
+            items: [
+                {
+                    icon: "🚀",
+                    title: "Innovation",
+                    description: "We believe in pushing the boundaries of what's possible with vanilla JavaScript."
+                },
+                {
+                    icon: "🤝",
+                    title: "Community",
+                    description: "Building tools that empower developers and designers to create amazing experiences."
+                },
+                {
+                    icon: "🎯",
+                    title: "Simplicity",
+                    description: "Complex functionality shouldn't require complex code. We make it simple."
+                }
+            ]
+        }));
+
+        aboutPage.add(new Footer({
+            copyright: "© 2024 WebBuilder Framework. All rights reserved."
+        }));
+
+        // SERVICES PAGE
+        const servicesPage = new Page('services');
+        
+        servicesPage.add(new NavBar({
+            logo: "WebBuilder",
+            logoSize: "large",
+            themeToggle: true,
+            links: [
+                { title: "Home", href: "#" },
+                { title: "About", href: "#about" },
+                { title: "Services", href: "#services" },
+                { title: "Contact", href: "#contact" }
+            ]
+        }));
+
+        servicesPage.add(new HeroBanner("Our Services", {
+            subtitle: "Everything you need to build professional websites",
+            bgColor: "linear-gradient(45deg, #ff6b6b, #4ecdc4)",
+            height: "50vh"
+        }));
+
+        servicesPage.add(new FeatureGrid("What We Offer", {
+            items: [
+                {
+                    icon: "🏗️",
+                    title: "Framework Development",
+                    description: "Building robust, scalable frameworks for modern web development."
+                },
+                {
+                    icon: "📚",
+                    title: "Documentation",
+                    description: "Comprehensive guides and examples to get you started quickly."
+                },
+                {
+                    icon: "🛠️",
+                    title: "Support",
+                    description: "Dedicated support to help you build amazing websites."
+                },
+                {
+                    icon: "🎨",
+                    title: "Design Systems",
+                    description: "Pre-built components that follow design best practices."
+                },
+                {
+                    icon: "⚡",
+                    title: "Performance",
+                    description: "Optimized code that delivers lightning-fast websites."
+                },
+                {
+                    icon: "🔄",
+                    title: "Updates",
+                    description: "Regular updates with new features and improvements."
+                }
+            ]
+        }));
+
+        servicesPage.add(new Footer({
+            copyright: "© 2024 WebBuilder Framework. All rights reserved."
+        }));
+
+        // PORTFOLIO PAGE
+        const portfolioPage = new Page('portfolio');
+        
+        portfolioPage.add(new NavBar({
+            logo: "WebBuilder",
+            logoSize: "large",
+            themeToggle: true,
+            links: [
+                { title: "Home", href: "#" },
+                { title: "About", href: "#about" },
+                { title: "Services", href: "#services" },
+                { title: "Contact", href: "#contact" }
+            ]
+        }));
+
+        portfolioPage.add(new HeroBanner("Our Portfolio", {
+            subtitle: "See what's possible with WebBuilder",
+            bgColor: "#34495e",
+            height: "50vh"
+        }));
+
+        portfolioPage.add(new Gallery("Recent Projects", {
+            images: [
+                "https://picsum.photos/400/300?random=1",
+                "https://picsum.photos/400/300?random=2",
+                "https://picsum.photos/400/300?random=3",
+                "https://picsum.photos/400/300?random=4",
+                "https://picsum.photos/400/300?random=5",
+                "https://picsum.photos/400/300?random=6"
+            ]
+        }));
+
+        portfolioPage.add(new CTA("Ready to Start Your Project?", {
+            subtitle: "Let's build something amazing together",
+            bgColor: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            buttons: [
+                { title: "Get Started", primary: true },
+                { title: "View Pricing", primary: false }
+            ]
+        }));
+
+        portfolioPage.add(new Footer({
+            copyright: "© 2024 WebBuilder Framework. All rights reserved."
+        }));
+
+        // PRICING PAGE
+        const pricingPage = new Page('pricing');
+        
+        pricingPage.add(new NavBar({
+            logo: "WebBuilder",
+            logoSize: "large",
+            themeToggle: true,
+            links: [
+                { title: "Home", href: "#" },
+                { title: "About", href: "#about" },
+                { title: "Services", href: "#services" },
+                { title: "Contact", href: "#contact" }
+            ]
+        }));
+
+        pricingPage.add(new HeroBanner("Choose Your Plan", {
+            subtitle: "Flexible pricing for teams of all sizes",
+            bgColor: "linear-gradient(45deg, #667eea, #764ba2)",
+            height: "50vh"
+        }));
+
+        pricingPage.add(new PricingTable("Pricing Plans", {
+            plans: [
+                {
+                    title: "Starter",
+                    price: "0",
+                    period: "month",
+                    description: "Perfect for personal projects",
+                    features: [
+                        "Up to 3 websites",
+                        "Basic components",
+                        "Community support",
+                        "Open source license"
+                    ],
+                    buttonText: "Get Started",
+                    buttonLink: "#"
+                },
+                {
+                    title: "Professional",
+                    price: "29",
+                    period: "month",
+                    description: "For freelancers and small teams",
+                    features: [
+                        "Unlimited websites",
+                        "All components",
+                        "Priority support",
+                        "Advanced themes",
+                        "Custom branding"
+                    ],
+                    buttonText: "Start Free Trial",
+                    buttonLink: "#",
+                    featured: true
+                },
+                {
+                    title: "Enterprise",
+                    price: "99",
+                    period: "month",
+                    description: "For large teams and organizations",
+                    features: [
+                        "Everything in Professional",
+                        "Custom components",
+                        "Dedicated support",
+                        "On-premise deployment",
+                        "SLA guarantee"
+                    ],
+                    buttonText: "Contact Sales",
+                    buttonLink: "#"
+                }
+            ]
+        }));
+
+        pricingPage.add(new Footer({
+            copyright: "© 2024 WebBuilder Framework. All rights reserved."
+        }));
+
+        // CONTACT PAGE
+        const contactPage = new Page('contact');
+        
+        contactPage.add(new NavBar({
+            logo: "WebBuilder",
+            logoSize: "large",
+            themeToggle: true,
+            links: [
+                { title: "Home", href: "#" },
+                { title: "About", href: "#about" },
+                { title: "Services", href: "#services" },
+                { title: "Contact", href: "#contact" }
+            ]
+        }));
+
+        contactPage.add(new HeroBanner("Get In Touch", {
+            subtitle: "We'd love to hear from you",
+            bgColor: "#27ae60",
+            height: "50vh"
+        }));
+
+        contactPage.add(new ContactForm("Contact Us", {
+            subtitle: "Send us a message and we'll get back to you as soon as possible",
+            fields: [
+                { type: 'text', name: 'name', label: 'Full Name', required: true },
+                { type: 'email', name: 'email', label: 'Email Address', required: true },
+                { type: 'text', name: 'company', label: 'Company', required: false },
+                { type: 'textarea', name: 'message', label: 'Message', required: true }
+            ],
+            buttonText: "Send Message"
+        }));
+
+        contactPage.add(new FeatureGrid("Other Ways to Reach Us", {
+            items: [
+                {
+                    icon: "📧",
+                    title: "Email",
+                    description: "hello@webbuilder.com"
+                },
+                {
+                    icon: "💬",
+                    title: "Discord",
+                    description: "Join our community server"
+                },
+                {
+                    icon: "📱",
+                    title: "Twitter",
+                    description: "@webbuilder_js"
+                }
+            ]
+        }));
+
+        contactPage.add(new Footer({
+            copyright: "© 2024 WebBuilder Framework. All rights reserved."
+        }));
+
+        // Add all pages to website
+        website.add(homePage);
+        website.add(aboutPage);
+        website.add(servicesPage);
+        website.add(portfolioPage);
+        website.add(pricingPage);
+        website.add(contactPage);
+
+        // Display website
+        website.display('body');
+
+        // Page navigation function
+        function showPage(pageName) {
+            website.showPage(pageName);
+            
+            // Update nav buttons
+            document.querySelectorAll('.page-nav button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`nav-${pageName}`).classList.add('active');
+        }
+
+        // Make showPage globally available
+        window.showPage = showPage;
+    </script>
+</body>
+</html>
