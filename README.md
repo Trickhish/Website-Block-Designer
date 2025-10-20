@@ -517,20 +517,211 @@ The framework uses CSS custom properties for theming:
 }
 ```
 
-### Responsive Design
+## Responsive Design System
 
-Built-in mobile-first responsive design:
+WebBuilder Framework features a comprehensive responsive design system with mobile-first approach and optimized layouts for all screen sizes.
+
+### Breakpoint System
+
+The framework uses three main breakpoints:
+
+- **Mobile**: Default styles (up to 768px)
+- **Tablet**: 769px - 1024px
+- **Desktop**: 1025px and above
+- **Large Desktop**: 1400px and above
+
+### Mobile Navigation (Burger Menu)
+
+The NavBar component automatically switches to a burger menu on mobile devices:
+
+```javascript
+new NavBar({
+    logo: "Brand Name",
+    pageNavigation: true,
+    themeToggle: true
+    // Burger menu is automatically enabled on mobile
+})
+```
+
+#### Mobile Menu Features:
+- **Slide-in overlay**: Full-screen navigation overlay
+- **Animated burger icon**: Three-line hamburger that transforms to X
+- **Auto-close**: Menu closes when links are clicked
+- **Touch-friendly**: Large touch targets for better mobile UX
+
+### Component Responsive Behavior
+
+#### Grid Components
+All grid-based components automatically adjust their columns:
+
+```javascript
+// FeatureGrid example - responsive columns
+new FeatureGrid("Features", {
+    columns: 3,  // 3 columns on desktop
+    // Automatically becomes:
+    // - 2 columns on tablet
+    // - 1 column on mobile
+    items: [...]
+})
+```
+
+**Responsive Column Behavior:**
+- **Desktop**: As specified (e.g., 3 columns)
+- **Tablet**: 2 columns maximum
+- **Mobile**: 1 column
+
+#### Typography Scaling
+
+Font sizes automatically scale across devices:
 
 ```css
-/* Mobile styles are default */
-.wb-hero__title {
-    font-size: 2rem;
+/* Desktop */
+.wb-hero__title { font-size: 3.5rem; }
+.wb-section-title { font-size: 3rem; }
+
+/* Tablet */
+.wb-hero__title { font-size: 2.5rem; }
+.wb-section-title { font-size: 2.5rem; }
+
+/* Mobile */
+.wb-hero__title { font-size: 2rem; }
+.wb-section-title { font-size: 2rem; }
+```
+
+#### Spacing & Layout
+
+Containers and spacing adapt to screen size:
+
+```css
+/* Container padding */
+.wb-container {
+    max-width: 1200px;       /* Desktop */
+    padding: 0 2rem;         /* Tablet */
+    padding: 0 1rem;         /* Mobile */
+    max-width: 1400px;       /* Large Desktop */
 }
 
-/* Desktop styles */
-@media (min-width: 768px) {
-    .wb-hero__title {
-        font-size: 3.5rem;
+/* Section padding */
+.wb-section {
+    padding: 5rem 0;         /* Desktop */
+    padding: 3rem 0;         /* Mobile */
+}
+```
+
+### Component-Specific Responsive Features
+
+#### PricingTable
+```javascript
+new PricingTable("Pricing", {
+    plans: [...]
+    // Desktop: 3 columns side by side
+    // Tablet: 2 columns
+    // Mobile: 1 column (stacked)
+})
+```
+
+#### Gallery
+```javascript
+new Gallery("Portfolio", {
+    images: [...],
+    columns: 3
+    // Auto-adjusts to 2 columns on tablet, varies on mobile
+})
+```
+
+#### Stats Section
+```javascript
+new StatsSection("Numbers", {
+    stats: [...]
+    // Desktop: 4 columns
+    // Tablet/Mobile: 2 columns
+})
+```
+
+#### Forms
+Mobile-optimized form inputs:
+- **Font size**: 16px to prevent iOS zoom
+- **Larger touch targets**: Improved mobile usability
+- **Stacked layout**: Single column on mobile
+
+#### Buttons
+```javascript
+// Button groups stack on mobile
+new CTA("Call to Action", {
+    buttons: [
+        { title: "Primary", primary: true },
+        { title: "Secondary", primary: false }
+    ]
+    // Desktop: side by side
+    // Mobile: stacked vertically
+})
+```
+
+### Mobile-First Development
+
+The framework follows mobile-first principles:
+
+1. **Default styles target mobile devices**
+2. **Progressive enhancement for larger screens**
+3. **Touch-friendly interface elements**
+4. **Optimized performance for mobile networks**
+
+### Responsive Best Practices
+
+#### Content Strategy
+- **Prioritize important content** for mobile users
+- **Use shorter headlines** on mobile devices
+- **Ensure readable font sizes** (minimum 16px)
+
+#### Performance
+- **Lazy loading**: Images load as needed
+- **Optimized animations**: Reduced motion on mobile
+- **Minimal dependencies**: Faster load times
+
+#### Accessibility
+- **Large touch targets**: Minimum 44px tap targets
+- **Keyboard navigation**: Full keyboard support
+- **Screen reader friendly**: Semantic HTML structure
+
+### Testing Responsive Design
+
+#### Browser Dev Tools
+```javascript
+// Test different screen sizes in browser
+// Chrome DevTools: Toggle device toolbar (Ctrl/Cmd + Shift + M)
+```
+
+#### Real Device Testing
+- **iOS Safari**: Test on actual iPhone/iPad
+- **Android Chrome**: Test on Android devices
+- **Different orientations**: Portrait and landscape
+
+#### Common Breakpoints for Testing
+- **320px**: Small mobile (iPhone SE)
+- **375px**: Standard mobile (iPhone)
+- **768px**: Tablet breakpoint
+- **1024px**: Small desktop/large tablet
+- **1200px**: Standard desktop
+- **1400px+**: Large desktop
+
+### Custom Responsive Styling
+
+You can add custom responsive styles:
+
+```css
+/* Custom mobile styles */
+@media (max-width: 768px) {
+    .custom-component {
+        font-size: 0.9rem;
+        padding: 1rem;
+    }
+}
+
+/* Custom tablet styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .custom-component {
+        font-size: 1.1rem;
+        padding: 1.5rem;
     }
 }
 ```
@@ -642,6 +833,16 @@ website.display('body');
 - ES6+ support (classes, arrow functions, template literals)
 - CSS Grid and Flexbox support
 - CSS Custom Properties support
+- Media queries support for responsive design
+
+### Mobile Browser Optimizations
+
+The framework includes specific optimizations for mobile browsers:
+
+- **iOS Safari**: Prevents zoom on form inputs (16px font size)
+- **Android Chrome**: Touch-friendly tap targets (44px minimum)
+- **Mobile Performance**: Optimized animations and transitions
+- **Touch Events**: Proper touch event handling for mobile interactions
 
 ## Best Practices
 
@@ -665,9 +866,13 @@ website.display('body');
 ### Development Tips
 - Start with a single page and expand
 - Use the theme system for consistent colors
-- Test responsive design on multiple devices
+- Test responsive design on multiple devices and orientations
 - Validate forms before submission
 - Use the smart link detection for internal navigation
+- Design mobile-first, then enhance for desktop
+- Keep touch targets at least 44px for mobile usability
+- Test the burger menu functionality on actual mobile devices
+- Ensure all content is accessible on small screens
 
 ## Troubleshooting
 
@@ -691,6 +896,21 @@ website.display('body');
 - Use `wb-` prefixed classes for consistency
 - Avoid global CSS that might conflict
 - Use CSS specificity correctly
+
+**Mobile menu not working:**
+- Ensure JavaScript is enabled
+- Check for console errors
+- Verify touch events are supported
+
+**Responsive layouts breaking:**
+- Test different screen sizes in dev tools
+- Check for fixed widths that prevent responsiveness
+- Ensure CSS Grid and Flexbox are supported
+
+**Content not scaling properly:**
+- Use relative units (rem, em, %) instead of fixed pixels
+- Test on actual mobile devices
+- Check viewport meta tag is present
 
 ---
 

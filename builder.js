@@ -641,6 +641,16 @@ class NavBar {
 
         container.appendChild(leftSide);
 
+        // Mobile burger menu button
+        const burgerButton = document.createElement('button');
+        burgerButton.className = 'wb-navbar__burger';
+        burgerButton.innerHTML = `
+            <span class="wb-navbar__burger-line"></span>
+            <span class="wb-navbar__burger-line"></span>
+            <span class="wb-navbar__burger-line"></span>
+        `;
+        burgerButton.addEventListener('click', () => this.toggleMobileMenu(nav));
+
         // Right side - Links and theme toggle
         const rightSide = document.createElement('div');
         rightSide.className = 'wb-navbar__right';
@@ -664,6 +674,8 @@ class NavBar {
                 a.addEventListener('click', (e) => {
                     e.preventDefault();
                     website.showPage(pageName);
+                    // Close mobile menu when link is clicked
+                    nav.classList.remove('wb-navbar--mobile-open');
                 });
                 li.appendChild(a);
                 linksContainer.appendChild(li);
@@ -677,6 +689,10 @@ class NavBar {
             a.href = link.href;
             a.textContent = link.title;
             a.className = 'wb-navbar__link';
+            a.addEventListener('click', () => {
+                // Close mobile menu when link is clicked
+                nav.classList.remove('wb-navbar--mobile-open');
+            });
             li.appendChild(a);
             linksContainer.appendChild(li);
         });
@@ -700,6 +716,7 @@ class NavBar {
         }
 
         container.appendChild(rightSide);
+        container.appendChild(burgerButton);
         nav.appendChild(container);
 
         // Listen for page changes to update active links
@@ -724,6 +741,10 @@ class NavBar {
             const newTheme = this.page.website.toggleTheme();
             button.innerHTML = newTheme === 'dark' ? '☀️' : '🌙';
         }
+    }
+
+    toggleMobileMenu(nav) {
+        nav.classList.toggle('wb-navbar--mobile-open');
     }
 }
 
@@ -1582,6 +1603,38 @@ const styles = `
         list-style: none;
         gap: 2rem;
         margin: 0;
+    }
+
+    .wb-navbar__burger {
+        display: none;
+        flex-direction: column;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        width: 30px;
+        height: 24px;
+        justify-content: space-between;
+    }
+
+    .wb-navbar__burger-line {
+        width: 100%;
+        height: 3px;
+        background-color: var(--text-color);
+        transition: all 0.3s ease;
+        transform-origin: center;
+    }
+
+    .wb-navbar--mobile-open .wb-navbar__burger-line:nth-child(1) {
+        transform: rotate(45deg) translate(6px, 6px);
+    }
+
+    .wb-navbar--mobile-open .wb-navbar__burger-line:nth-child(2) {
+        opacity: 0;
+    }
+
+    .wb-navbar--mobile-open .wb-navbar__burger-line:nth-child(3) {
+        transform: rotate(-45deg) translate(6px, -6px);
     }
 
     .wb-navbar__link {
@@ -2463,20 +2516,8 @@ const styles = `
             font-size: 1rem;
         }
 
-        .wb-navbar__links {
-            gap: 1rem;
-        }
-
         .wb-section-title {
             font-size: 2rem;
-        }
-
-        .wb-navbar__right {
-            gap: 0.5rem;
-        }
-
-        .wb-navbar__links {
-            gap: 1rem;
         }
 
         .wb-pricing-card--featured {
@@ -2494,6 +2535,148 @@ const styles = `
         .wb-cta__buttons {
             flex-direction: column;
             align-items: center;
+        }
+
+        /* Mobile navbar styles */
+        .wb-navbar__burger {
+            display: flex;
+        }
+
+        .wb-navbar__right {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100vh;
+            background-color: var(--bg-color);
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: left 0.3s ease;
+            z-index: 1000;
+        }
+
+        .wb-navbar--mobile-open .wb-navbar__right {
+            left: 0;
+        }
+
+        .wb-navbar__links {
+            flex-direction: column;
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .wb-navbar__link {
+            font-size: 1.2rem;
+            padding: 1rem;
+        }
+
+        .wb-navbar__theme-toggle {
+            margin-top: 2rem;
+            font-size: 1.5rem;
+            padding: 1rem;
+        }
+
+        /* Enhanced responsive grid systems */
+        .wb-features__grid,
+        .wb-testimonials__grid,
+        .wb-team__grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .wb-pricing__grid {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        /* Better mobile spacing */
+        .wb-container {
+            padding: 0 1rem;
+        }
+
+        .wb-section {
+            padding: 3rem 0;
+        }
+
+        /* Mobile form improvements */
+        .wb-contact-form__field {
+            margin-bottom: 1.5rem;
+        }
+
+        .wb-contact-form__input,
+        .wb-contact-form__textarea {
+            font-size: 16px; /* Prevents zoom on iOS */
+        }
+
+        /* Stats section mobile */
+        .wb-stats__grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        /* FAQ mobile improvements */
+        .wb-faq__question {
+            font-size: 1rem;
+            padding: 1rem;
+        }
+
+        /* Timeline mobile */
+        .wb-timeline__item {
+            margin-left: 0;
+            padding-left: 2rem;
+        }
+
+        .wb-timeline__item::before {
+            left: 0;
+        }
+    }
+
+    /* Tablet styles */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .wb-features__grid,
+        .wb-testimonials__grid,
+        .wb-team__grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .wb-pricing__grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .wb-gallery__grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .wb-stats__grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .wb-hero__title {
+            font-size: 2.5rem;
+        }
+
+        .wb-section-title {
+            font-size: 2.5rem;
+        }
+
+        .wb-container {
+            padding: 0 2rem;
+        }
+    }
+
+    /* Large screens - enhanced spacing */
+    @media (min-width: 1400px) {
+        .wb-container {
+            max-width: 1400px;
+        }
+
+        .wb-hero__title {
+            font-size: 4rem;
+        }
+
+        .wb-section-title {
+            font-size: 3.5rem;
         }
     }
 `;
