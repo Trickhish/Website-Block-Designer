@@ -11,6 +11,33 @@ class Website {
             defaultPage: options.defaultPage || 'home',
             theme: options.theme || 'light',
             darkMode: options.darkMode || false,
+            colors: {
+                primary: options.colors?.primary || '#6c63ff',
+                primaryDark: options.colors?.primaryDark || '#5952d4',
+                // Light theme colors
+                light: {
+                    text: options.colors?.light?.text || '#333',
+                    textMuted: options.colors?.light?.textMuted || '#666',
+                    background: options.colors?.light?.background || '#ffffff',
+                    backgroundAlt: options.colors?.light?.backgroundAlt || '#f8f9fa',
+                    border: options.colors?.light?.border || 'rgba(0,0,0,0.1)',
+                    shadow: options.colors?.light?.shadow || '0 2px 10px rgba(0,0,0,0.1)',
+                    shadowHover: options.colors?.light?.shadowHover || '0 4px 20px rgba(0,0,0,0.15)',
+                    ...options.colors?.light
+                },
+                // Dark theme colors
+                dark: {
+                    text: options.colors?.dark?.text || '#e1e1e1',
+                    textMuted: options.colors?.dark?.textMuted || '#b0b0b0',
+                    background: options.colors?.dark?.background || '#1a1a2e',
+                    backgroundAlt: options.colors?.dark?.backgroundAlt || '#16213e',
+                    border: options.colors?.dark?.border || 'rgba(255,255,255,0.1)',
+                    shadow: options.colors?.dark?.shadow || '0 2px 10px rgba(0,0,0,0.3)',
+                    shadowHover: options.colors?.dark?.shadowHover || '0 4px 20px rgba(0,0,0,0.4)',
+                    ...options.colors?.dark
+                },
+                ...options.colors
+            },
             ...options
         };
         this.container = null;
@@ -35,7 +62,7 @@ class Website {
             document.documentElement.style.scrollBehavior = 'smooth';
         }
 
-        // Apply theme
+        // Apply theme and custom colors
         this.setTheme(this.options.darkMode ? 'dark' : 'light');
 
         // Display default page
@@ -47,9 +74,31 @@ class Website {
         this.options.darkMode = theme === 'dark';
         document.body.setAttribute('data-theme', theme);
         
+        // Apply custom colors to CSS variables
+        this.applyCustomColors();
+        
         // Trigger theme change event for components that need to update
         const event = new CustomEvent('themechange', { detail: { theme } });
         document.dispatchEvent(event);
+    }
+
+    applyCustomColors() {
+        const root = document.documentElement;
+        const colors = this.options.colors;
+        const themeColors = colors[this.options.theme] || colors.light;
+        
+        // Apply primary colors (theme-independent)
+        root.style.setProperty('--primary-color', colors.primary);
+        root.style.setProperty('--primary-dark', colors.primaryDark);
+        
+        // Apply theme-specific colors
+        root.style.setProperty('--text-color', themeColors.text);
+        root.style.setProperty('--text-muted', themeColors.textMuted);
+        root.style.setProperty('--bg-color', themeColors.background);
+        root.style.setProperty('--bg-alt', themeColors.backgroundAlt);
+        root.style.setProperty('--border-color', themeColors.border);
+        root.style.setProperty('--shadow', themeColors.shadow);
+        root.style.setProperty('--shadow-hover', themeColors.shadowHover);
     }
 
     toggleTheme() {
@@ -69,6 +118,16 @@ class Website {
         this.container.innerHTML = '';
         this.container.appendChild(page.render());
 
+        // Trigger page change event for components that need to update
+        const event = new CustomEvent('pagechange', { 
+            detail: { 
+                pageName: pageName, 
+                page: page,
+                pages: Object.keys(this.pages)
+            } 
+        });
+        document.dispatchEvent(event);
+
         // Handle hash navigation
         if (window.location.hash) {
             setTimeout(() => {
@@ -76,6 +135,415 @@ class Website {
                 if (element) element.scrollIntoView();
             }, 100);
         }
+    }
+
+    getPageNames() {
+        return Object.keys(this.pages);
+    }
+
+    getCurrentPageName() {
+        return this.currentPage ? this.currentPage.name : null;
+    }
+
+    updateColors(newColors) {
+        // Deep merge new colors with existing colors
+        this.options.colors = this.mergeColors(this.options.colors, newColors);
+        this.applyCustomColors();
+    }
+
+    mergeColors(existing, updates) {
+        const result = { ...existing };
+        
+        Object.keys(updates).forEach(key => {
+            if (key === 'light' || key === 'dark') {
+                result[key] = { ...existing[key], ...updates[key] };
+            } else {
+                result[key] = updates[key];
+            }
+        });
+        
+        return result;
+    }
+}
+
+class TeamSection {
+    constructor(title, options = {}) {
+        this.title = title;
+        this.options = {
+            id: options.id || null,
+            subtitle: options.subtitle || '',
+            members: options.members || [],
+            columns: options.columns || 3,
+            ...options
+        };
+    }
+
+    render() {
+        const section = document.createElement('section');
+        section.className = 'wb-team';
+        if (this.options.id) section.id = this.options.id;
+
+        const container = document.createElement('div');
+        container.className = 'wb-container';
+
+        const title = document.createElement('h2');
+        title.className = 'wb-section-title';
+        title.textContent = this.title;
+        container.appendChild(title);
+
+        if (this.options.subtitle) {
+            const subtitle = document.createElement('p');
+            subtitle.className = 'wb-team__subtitle';
+            subtitle.textContent = this.options.subtitle;
+            container.appendChild(subtitle);
+        }
+
+        const grid = document.createElement('div');
+        grid.className = 'wb-team__grid';
+
+        this.options.members.forEach(member => {
+            const card = document.createElement('div');
+            card.className = 'wb-team-card';
+
+            if (member.image) {
+                const img = document.createElement('img');
+                img.className = 'wb-team-card__image';
+                img.src = member.image;
+                img.alt = member.name;
+                img.loading = 'lazy';
+                card.appendChild(img);
+            }
+
+            const info = document.createElement('div');
+            info.className = 'wb-team-card__info';
+
+            const name = document.createElement('h3');
+            name.className = 'wb-team-card__name';
+            name.textContent = member.name;
+            info.appendChild(name);
+
+            if (member.role) {
+                const role = document.createElement('p');
+                role.className = 'wb-team-card__role';
+                role.textContent = member.role;
+                info.appendChild(role);
+            }
+
+            if (member.description) {
+                const desc = document.createElement('p');
+                desc.className = 'wb-team-card__description';
+                desc.textContent = member.description;
+                info.appendChild(desc);
+            }
+
+            card.appendChild(info);
+            grid.appendChild(card);
+        });
+
+        container.appendChild(grid);
+        section.appendChild(container);
+        return section;
+    }
+}
+
+class TextSection {
+    constructor(title, content, options = {}) {
+        this.title = title;
+        this.content = content;
+        this.options = {
+            id: options.id || null,
+            alignment: options.alignment || 'left', // left, center, right
+            maxWidth: options.maxWidth || '800px',
+            bgColor: options.bgColor || 'transparent',
+            ...options
+        };
+    }
+
+    render() {
+        const section = document.createElement('section');
+        section.className = 'wb-text-section';
+        if (this.options.id) section.id = this.options.id;
+
+        if (this.options.bgColor !== 'transparent') {
+            section.style.backgroundColor = this.options.bgColor;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'wb-container';
+
+        const content = document.createElement('div');
+        content.className = `wb-text-section__content wb-text-section__content--${this.options.alignment}`;
+        content.style.maxWidth = this.options.maxWidth;
+
+        if (this.title) {
+            const title = document.createElement('h2');
+            title.className = 'wb-section-title';
+            title.textContent = this.title;
+            content.appendChild(title);
+        }
+
+        const text = document.createElement('div');
+        text.className = 'wb-text-section__text';
+        text.innerHTML = this.content;
+        content.appendChild(text);
+
+        container.appendChild(content);
+        section.appendChild(container);
+        return section;
+    }
+}
+
+class FAQ {
+    constructor(title, options = {}) {
+        this.title = title;
+        this.options = {
+            id: options.id || null,
+            subtitle: options.subtitle || '',
+            questions: options.questions || [],
+            ...options
+        };
+    }
+
+    render() {
+        const section = document.createElement('section');
+        section.className = 'wb-faq';
+        if (this.options.id) section.id = this.options.id;
+
+        const container = document.createElement('div');
+        container.className = 'wb-container';
+
+        const title = document.createElement('h2');
+        title.className = 'wb-section-title';
+        title.textContent = this.title;
+        container.appendChild(title);
+
+        if (this.options.subtitle) {
+            const subtitle = document.createElement('p');
+            subtitle.className = 'wb-faq__subtitle';
+            subtitle.textContent = this.options.subtitle;
+            container.appendChild(subtitle);
+        }
+
+        const faqList = document.createElement('div');
+        faqList.className = 'wb-faq__list';
+
+        this.options.questions.forEach((item, index) => {
+            const faqItem = document.createElement('div');
+            faqItem.className = 'wb-faq__item';
+
+            const question = document.createElement('button');
+            question.className = 'wb-faq__question';
+            question.textContent = item.question;
+            question.addEventListener('click', () => this.toggleAnswer(faqItem));
+
+            const answer = document.createElement('div');
+            answer.className = 'wb-faq__answer';
+            answer.innerHTML = item.answer;
+
+            faqItem.appendChild(question);
+            faqItem.appendChild(answer);
+            faqList.appendChild(faqItem);
+        });
+
+        container.appendChild(faqList);
+        section.appendChild(container);
+        return section;
+    }
+
+    toggleAnswer(faqItem) {
+        const isActive = faqItem.classList.contains('wb-faq__item--active');
+        
+        // Close all other items
+        faqItem.parentNode.querySelectorAll('.wb-faq__item').forEach(item => {
+            item.classList.remove('wb-faq__item--active');
+        });
+
+        // Toggle current item
+        if (!isActive) {
+            faqItem.classList.add('wb-faq__item--active');
+        }
+    }
+}
+
+class StatsSection {
+    constructor(title, options = {}) {
+        this.title = title;
+        this.options = {
+            id: options.id || null,
+            stats: options.stats || [],
+            bgColor: options.bgColor || 'transparent',
+            ...options
+        };
+    }
+
+    render() {
+        const section = document.createElement('section');
+        section.className = 'wb-stats';
+        if (this.options.id) section.id = this.options.id;
+
+        if (this.options.bgColor !== 'transparent') {
+            section.style.backgroundColor = this.options.bgColor;
+        }
+
+        const container = document.createElement('div');
+        container.className = 'wb-container';
+
+        if (this.title) {
+            const title = document.createElement('h2');
+            title.className = 'wb-section-title';
+            title.textContent = this.title;
+            container.appendChild(title);
+        }
+
+        const grid = document.createElement('div');
+        grid.className = 'wb-stats__grid';
+
+        this.options.stats.forEach(stat => {
+            const statItem = document.createElement('div');
+            statItem.className = 'wb-stat-item';
+
+            const number = document.createElement('div');
+            number.className = 'wb-stat-item__number';
+            number.textContent = stat.number;
+            
+            const label = document.createElement('div');
+            label.className = 'wb-stat-item__label';
+            label.textContent = stat.label;
+
+            if (stat.suffix) {
+                number.textContent += stat.suffix;
+            }
+
+            statItem.appendChild(number);
+            statItem.appendChild(label);
+            grid.appendChild(statItem);
+        });
+
+        container.appendChild(grid);
+        section.appendChild(container);
+        return section;
+    }
+}
+
+class VideoSection {
+    constructor(title, videoUrl, options = {}) {
+        this.title = title;
+        this.videoUrl = videoUrl;
+        this.options = {
+            id: options.id || null,
+            subtitle: options.subtitle || '',
+            poster: options.poster || null,
+            autoplay: options.autoplay || false,
+            controls: options.controls !== false,
+            ...options
+        };
+    }
+
+    render() {
+        const section = document.createElement('section');
+        section.className = 'wb-video';
+        if (this.options.id) section.id = this.options.id;
+
+        const container = document.createElement('div');
+        container.className = 'wb-container';
+
+        if (this.title) {
+            const title = document.createElement('h2');
+            title.className = 'wb-section-title';
+            title.textContent = this.title;
+            container.appendChild(title);
+        }
+
+        if (this.options.subtitle) {
+            const subtitle = document.createElement('p');
+            subtitle.className = 'wb-video__subtitle';
+            subtitle.textContent = this.options.subtitle;
+            container.appendChild(subtitle);
+        }
+
+        const videoContainer = document.createElement('div');
+        videoContainer.className = 'wb-video__container';
+
+        const video = document.createElement('video');
+        video.className = 'wb-video__player';
+        video.src = this.videoUrl;
+        video.controls = this.options.controls;
+        video.autoplay = this.options.autoplay;
+        
+        if (this.options.poster) {
+            video.poster = this.options.poster;
+        }
+
+        videoContainer.appendChild(video);
+        container.appendChild(videoContainer);
+        section.appendChild(container);
+        return section;
+    }
+}
+
+class Timeline {
+    constructor(title, options = {}) {
+        this.title = title;
+        this.options = {
+            id: options.id || null,
+            events: options.events || [],
+            ...options
+        };
+    }
+
+    render() {
+        const section = document.createElement('section');
+        section.className = 'wb-timeline';
+        if (this.options.id) section.id = this.options.id;
+
+        const container = document.createElement('div');
+        container.className = 'wb-container';
+
+        const title = document.createElement('h2');
+        title.className = 'wb-section-title';
+        title.textContent = this.title;
+        container.appendChild(title);
+
+        const timeline = document.createElement('div');
+        timeline.className = 'wb-timeline__container';
+
+        this.options.events.forEach((event, index) => {
+            const item = document.createElement('div');
+            item.className = 'wb-timeline__item';
+
+            const marker = document.createElement('div');
+            marker.className = 'wb-timeline__marker';
+
+            const content = document.createElement('div');
+            content.className = 'wb-timeline__content';
+
+            if (event.date) {
+                const date = document.createElement('div');
+                date.className = 'wb-timeline__date';
+                date.textContent = event.date;
+                content.appendChild(date);
+            }
+
+            const eventTitle = document.createElement('h3');
+            eventTitle.className = 'wb-timeline__title';
+            eventTitle.textContent = event.title;
+            content.appendChild(eventTitle);
+
+            if (event.description) {
+                const desc = document.createElement('p');
+                desc.className = 'wb-timeline__description';
+                desc.textContent = event.description;
+                content.appendChild(desc);
+            }
+
+            item.appendChild(marker);
+            item.appendChild(content);
+            timeline.appendChild(item);
+        });
+
+        container.appendChild(timeline);
+        section.appendChild(container);
+        return section;
     }
 }
 
@@ -121,6 +589,8 @@ class NavBar {
             logoSize: options.logoSize || 'medium',
             fixed: options.fixed !== false,
             themeToggle: options.themeToggle !== false,
+            pageNavigation: options.pageNavigation !== false,
+            pageNavigationStyle: options.pageNavigationStyle || 'inline', // 'inline' or 'dropdown'
             ...options
         };
         this.website = null;
@@ -179,6 +649,28 @@ class NavBar {
         const linksContainer = document.createElement('ul');
         linksContainer.className = 'wb-navbar__links';
 
+        // Add page navigation links if enabled
+        if (this.options.pageNavigation && this.page && this.page.website) {
+            const website = this.page.website;
+            const pageNames = website.getPageNames();
+            const currentPageName = website.getCurrentPageName();
+            
+            pageNames.forEach(pageName => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = '#';
+                a.textContent = pageName.charAt(0).toUpperCase() + pageName.slice(1);
+                a.className = `wb-navbar__link wb-navbar__page-link ${currentPageName === pageName ? 'wb-navbar__link--active' : ''}`;
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    website.showPage(pageName);
+                });
+                li.appendChild(a);
+                linksContainer.appendChild(li);
+            });
+        }
+
+        // Add custom links
         this.options.links.forEach(link => {
             const li = document.createElement('li');
             const a = document.createElement('a');
@@ -209,6 +701,19 @@ class NavBar {
 
         container.appendChild(rightSide);
         nav.appendChild(container);
+
+        // Listen for page changes to update active links
+        if (this.options.pageNavigation) {
+            document.addEventListener('pagechange', (e) => {
+                const pageLinks = nav.querySelectorAll('.wb-navbar__page-link');
+                pageLinks.forEach(link => {
+                    link.classList.remove('wb-navbar__link--active');
+                    if (link.textContent.toLowerCase() === e.detail.pageName) {
+                        link.classList.add('wb-navbar__link--active');
+                    }
+                });
+            });
+        }
 
         return nav;
     }
@@ -261,8 +766,6 @@ class HeroBanner {
             hero.classList.add(textColorClass);
         }
 
-        console.log(hero, this.options.bgColor, this.options.bgImage);
-
         if (this.options.bgImage) {
             hero.style.setProperty('background-image', `url(${this.options.bgImage})`, 'important');
             hero.style.setProperty('background-size', 'cover', 'important');
@@ -308,6 +811,20 @@ class HeroBanner {
                 button.href = btn.link;
                 button.className = `wb-button ${btn.primary ? 'wb-button--primary' : 'wb-button--secondary'}`;
                 button.textContent = btn.title;
+                
+                // Smart link detection - check if link matches a page name
+                if (btn.link && this.page && this.page.website) {
+                    const pageNames = this.page.website.getPageNames();
+                    const linkName = btn.link.replace('#', '').toLowerCase();
+                    
+                    if (pageNames.includes(linkName)) {
+                        button.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            this.page.website.showPage(linkName);
+                        });
+                    }
+                }
+                
                 btnContainer.appendChild(button);
             });
 
@@ -322,7 +839,32 @@ class HeroBanner {
         // Convert color to RGB values and calculate luminance
         let r, g, b;
         
-        if (color.startsWith('#')) {
+        // Handle CSS color names
+        const colorNames = {
+            'white': [255, 255, 255],
+            'black': [0, 0, 0],
+            'red': [255, 0, 0],
+            'green': [0, 128, 0],
+            'blue': [0, 0, 255],
+            'yellow': [255, 255, 0],
+            'cyan': [0, 255, 255],
+            'magenta': [255, 0, 255],
+            'silver': [192, 192, 192],
+            'gray': [128, 128, 128],
+            'grey': [128, 128, 128],
+            'maroon': [128, 0, 0],
+            'olive': [128, 128, 0],
+            'lime': [0, 255, 0],
+            'aqua': [0, 255, 255],
+            'teal': [0, 128, 128],
+            'navy': [0, 0, 128],
+            'fuchsia': [255, 0, 255],
+            'purple': [128, 0, 128]
+        };
+        
+        if (colorNames[color.toLowerCase()]) {
+            [r, g, b] = colorNames[color.toLowerCase()];
+        } else if (color.startsWith('#')) {
             // Hex color
             const hex = color.slice(1);
             r = parseInt(hex.substr(0, 2), 16);
@@ -758,10 +1300,10 @@ class CTA {
         this.options = {
             id: options.id || null,
             subtitle: options.subtitle || '',
-            bgColor: options.bgColor || '#6c63ff',
+            bgColor: options.bgColor || 'transparent',
             bgImage: options.bgImage || null,
             buttons: options.buttons || [],
-            textColor: options.textColor || 'white',
+            textColor: options.textColor || 'auto', // auto, light, dark, inherit
             ...options
         };
     }
@@ -771,14 +1313,39 @@ class CTA {
         section.className = 'wb-cta';
         if (this.options.id) section.id = this.options.id;
         
-        if (this.options.bgImage) {
-            section.style.backgroundImage = `url(${this.options.bgImage})`;
-            section.style.backgroundSize = 'cover';
-            section.style.backgroundPosition = 'center';
+        // Determine text color based on background
+        let textColor;
+        if (this.options.textColor === 'auto') {
+            if (this.options.bgImage) {
+                textColor = 'white'; // Assume images are dark
+            } else if (this.options.bgColor === 'transparent') {
+                textColor = 'inherit'; // Use theme colors for transparent
+            } else if (this.isColorDark(this.options.bgColor)) {
+                textColor = 'white';
+            } else {
+                textColor = 'var(--text-color)';
+            }
+        } else if (this.options.textColor === 'inherit') {
+            textColor = 'inherit';
         } else {
-            section.style.backgroundColor = this.options.bgColor;
+            textColor = this.options.textColor;
         }
-        section.style.color = this.options.textColor;
+        
+        if (this.options.bgImage) {
+            section.style.setProperty('background-image', `url(${this.options.bgImage})`, 'important');
+            section.style.setProperty('background-size', 'cover', 'important');
+            section.style.setProperty('background-position', 'center', 'important');
+        } else if (this.options.bgColor !== 'transparent') {
+            // Only apply background if not transparent
+            if (this.options.bgColor.includes('gradient')) {
+                section.style.setProperty('background-image', this.options.bgColor, 'important');
+                section.style.setProperty('background-color', 'transparent', 'important');
+            } else {
+                section.style.setProperty('background-color', this.options.bgColor, 'important');
+                section.style.setProperty('background-image', 'none', 'important');
+            }
+        }
+        section.style.color = textColor;
 
         const container = document.createElement('div');
         container.className = 'wb-container';
@@ -807,6 +1374,20 @@ class CTA {
                 button.href = btn.link || '#';
                 button.className = `wb-button ${btn.primary ? 'wb-button--primary' : 'wb-button--secondary'}`;
                 button.textContent = btn.title;
+                
+                // Smart link detection - check if link matches a page name
+                if (btn.link && this.page && this.page.website) {
+                    const pageNames = this.page.website.getPageNames();
+                    const linkName = btn.link.replace('#', '').toLowerCase();
+                    
+                    if (pageNames.includes(linkName)) {
+                        button.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            this.page.website.showPage(linkName);
+                        });
+                    }
+                }
+                
                 btnContainer.appendChild(button);
             });
 
@@ -816,6 +1397,57 @@ class CTA {
         container.appendChild(content);
         section.appendChild(container);
         return section;
+    }
+
+    isColorDark(color) {
+        // Convert color to RGB values and calculate luminance
+        let r, g, b;
+        
+        // Handle CSS color names
+        const colorNames = {
+            'white': [255, 255, 255],
+            'black': [0, 0, 0],
+            'red': [255, 0, 0],
+            'green': [0, 128, 0],
+            'blue': [0, 0, 255],
+            'yellow': [255, 255, 0],
+            'cyan': [0, 255, 255],
+            'magenta': [255, 0, 255],
+            'silver': [192, 192, 192],
+            'gray': [128, 128, 128],
+            'grey': [128, 128, 128],
+            'maroon': [128, 0, 0],
+            'olive': [128, 128, 0],
+            'lime': [0, 255, 0],
+            'aqua': [0, 255, 255],
+            'teal': [0, 128, 128],
+            'navy': [0, 0, 128],
+            'fuchsia': [255, 0, 255],
+            'purple': [128, 0, 128]
+        };
+        
+        if (colorNames[color.toLowerCase()]) {
+            [r, g, b] = colorNames[color.toLowerCase()];
+        } else if (color.startsWith('#')) {
+            // Hex color
+            const hex = color.slice(1);
+            r = parseInt(hex.substr(0, 2), 16);
+            g = parseInt(hex.substr(2, 2), 16);
+            b = parseInt(hex.substr(4, 2), 16);
+        } else if (color.startsWith('rgb')) {
+            // RGB color
+            const values = color.match(/\d+/g);
+            r = parseInt(values[0]);
+            g = parseInt(values[1]);
+            b = parseInt(values[2]);
+        } else {
+            // Default to dark for unknown formats (gradients, etc.)
+            return true;
+        }
+        
+        // Calculate luminance
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        return luminance < 0.5;
     }
 }
 
@@ -858,6 +1490,11 @@ const styles = `
         color: var(--text-color);
         background-color: var(--bg-color);
         transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* Global text color inheritance */
+    h1, h2, h3, h4, h5, h6, p, span, div {
+        color: inherit;
     }
 
     .wb-container {
@@ -956,6 +1593,11 @@ const styles = `
 
     .wb-navbar__link:hover {
         color: var(--primary-color);
+    }
+
+    .wb-navbar__link--active {
+        color: var(--primary-color);
+        font-weight: 600;
     }
 
     .wb-navbar__theme-toggle {
@@ -1426,6 +2068,339 @@ const styles = `
         flex-wrap: wrap;
     }
 
+    /* Team Section */
+    .wb-team {
+        padding: 5rem 0;
+        background: var(--bg-color);
+        transition: background-color 0.3s;
+    }
+
+    .wb-team__subtitle {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 1.2rem;
+        margin-bottom: 3rem;
+        transition: color 0.3s;
+    }
+
+    .wb-team__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .wb-team-card {
+        background: var(--bg-alt);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        transition: all 0.3s;
+        text-align: center;
+    }
+
+    .wb-team-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .wb-team-card__image {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+    }
+
+    .wb-team-card__info {
+        padding: 2rem;
+    }
+
+    .wb-team-card__name {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-color);
+        transition: color 0.3s;
+    }
+
+    .wb-team-card__role {
+        color: var(--primary-color);
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+
+    .wb-team-card__description {
+        color: var(--text-muted);
+        line-height: 1.6;
+        transition: color 0.3s;
+    }
+
+    /* Text Section */
+    .wb-text-section {
+        padding: 5rem 0;
+        background: var(--bg-color);
+        transition: background-color 0.3s;
+    }
+
+    .wb-text-section__content {
+        margin: 0 auto;
+    }
+
+    .wb-text-section__content--left {
+        text-align: left;
+    }
+
+    .wb-text-section__content--center {
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .wb-text-section__content--right {
+        text-align: right;
+        margin-left: auto;
+    }
+
+    .wb-text-section__text {
+        color: var(--text-color);
+        line-height: 1.8;
+        font-size: 1.1rem;
+        transition: color 0.3s;
+    }
+
+    .wb-text-section__text p {
+        margin-bottom: 1.5rem;
+    }
+
+    .wb-text-section__text h3 {
+        color: var(--text-color);
+        margin: 2rem 0 1rem 0;
+        transition: color 0.3s;
+    }
+
+    .wb-text-section__text ul,
+    .wb-text-section__text ol {
+        margin-left: 2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .wb-text-section__text li {
+        margin-bottom: 0.5rem;
+        color: var(--text-color);
+        transition: color 0.3s;
+    }
+
+    /* FAQ Section */
+    .wb-faq {
+        padding: 5rem 0;
+        background: var(--bg-alt);
+        transition: background-color 0.3s;
+    }
+
+    .wb-faq__subtitle {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 1.2rem;
+        margin-bottom: 3rem;
+        transition: color 0.3s;
+    }
+
+    .wb-faq__list {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .wb-faq__item {
+        margin-bottom: 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--bg-color);
+        transition: all 0.3s;
+    }
+
+    .wb-faq__question {
+        width: 100%;
+        padding: 1.5rem;
+        background: none;
+        border: none;
+        text-align: left;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-color);
+        cursor: pointer;
+        transition: all 0.3s;
+        position: relative;
+    }
+
+    .wb-faq__question:after {
+        content: '+';
+        position: absolute;
+        right: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.5rem;
+        color: var(--primary-color);
+        transition: transform 0.3s;
+    }
+
+    .wb-faq__item--active .wb-faq__question:after {
+        transform: translateY(-50%) rotate(45deg);
+    }
+
+    .wb-faq__question:hover {
+        background: var(--bg-alt);
+    }
+
+    .wb-faq__answer {
+        max-height: 0;
+        overflow: hidden;
+        padding: 0 1.5rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+        transition: all 0.3s ease;
+    }
+
+    .wb-faq__item--active .wb-faq__answer {
+        max-height: 200px;
+        padding: 0 1.5rem 1.5rem;
+    }
+
+    /* Stats Section */
+    .wb-stats {
+        padding: 5rem 0;
+        background: var(--bg-color);
+        transition: background-color 0.3s;
+    }
+
+    .wb-stats__grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 3rem;
+        margin-top: 3rem;
+    }
+
+    .wb-stat-item {
+        text-align: center;
+    }
+
+    .wb-stat-item__number {
+        font-size: 3.5rem;
+        font-weight: 800;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+        line-height: 1;
+    }
+
+    .wb-stat-item__label {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        font-weight: 500;
+        transition: color 0.3s;
+    }
+
+    /* Video Section */
+    .wb-video {
+        padding: 5rem 0;
+        background: var(--bg-color);
+        transition: background-color 0.3s;
+    }
+
+    .wb-video__subtitle {
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 1.2rem;
+        margin-bottom: 3rem;
+        transition: color 0.3s;
+    }
+
+    .wb-video__container {
+        max-width: 800px;
+        margin: 0 auto;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--shadow-hover);
+    }
+
+    .wb-video__player {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    /* Timeline Section */
+    .wb-timeline {
+        padding: 5rem 0;
+        background: var(--bg-alt);
+        transition: background-color 0.3s;
+    }
+
+    .wb-timeline__container {
+        max-width: 600px;
+        margin: 3rem auto 0;
+        position: relative;
+    }
+
+    .wb-timeline__container:before {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--primary-color);
+    }
+
+    .wb-timeline__item {
+        display: flex;
+        margin-bottom: 3rem;
+        position: relative;
+    }
+
+    .wb-timeline__marker {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        border: 4px solid var(--bg-color);
+        box-shadow: var(--shadow);
+        flex-shrink: 0;
+        z-index: 1;
+    }
+
+    .wb-timeline__content {
+        background: var(--bg-color);
+        padding: 2rem;
+        border-radius: 12px;
+        margin-left: 2rem;
+        box-shadow: var(--shadow);
+        flex: 1;
+        transition: all 0.3s;
+    }
+
+    .wb-timeline__content:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .wb-timeline__date {
+        color: var(--primary-color);
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .wb-timeline__title {
+        color: var(--text-color);
+        margin-bottom: 1rem;
+        transition: color 0.3s;
+    }
+
+    .wb-timeline__description {
+        color: var(--text-muted);
+        line-height: 1.6;
+        transition: color 0.3s;
+    }
+
     /* Footer */
     .wb-footer {
         background: var(--bg-alt);
@@ -1541,6 +2516,12 @@ if (typeof module !== 'undefined' && module.exports) {
         PricingTable, 
         ContactForm, 
         Gallery, 
-        CTA 
+        CTA,
+        TeamSection,
+        TextSection,
+        FAQ,
+        StatsSection,
+        VideoSection,
+        Timeline
     };
 }

@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roule Galette - Crêperie Traiteur en Savoie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Courgette&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+        }
+        
+        .wb-navbar__logo-text {
+            font-family: 'Courgette', cursive;
+            font-size: 2rem;
+        }
+        
+        .wb-hero__title {
+            font-family: 'Courgette', cursive;
+        }
+        
+        .wb-section-title {
+            font-family: 'Courgette', cursive;
+        }
+        
+        .wb-cta__title {
+            font-family: 'Courgette', cursive;
+        }
+    </style>
+</head>
+<body>
+    <script src="builder.js"></script>
+    <script>
+        // Create website with RouleGalette brand colors
+        const website = new Website({
+            smoothScrolling: true,
+            defaultPage: 'accueil',
+            colors: {
+                primary: '#ffde4f',        // Yellow from original site
+                primaryDark: '#e6c545',    // Darker yellow for hover
+                light: {
+                    text: '#023465',       // Dark blue from original
+                    textMuted: '#555555',
+                    background: '#ffffff',
+                    backgroundAlt: '#f8f9fa',
+                    border: 'rgba(2,52,101,0.15)',
+                    shadow: '0 4px 12px rgba(2,52,101,0.1)',
+                    shadowHover: '0 8px 24px rgba(2,52,101,0.15)'
+                },
+                dark: {
+                    text: '#ffffff',
+                    textMuted: '#cccccc',
+                    background: '#023465',
+                    backgroundAlt: '#1a3a5c',
+                    border: 'rgba(255,222,79,0.2)',
+                    shadow: '0 4px 12px rgba(0,0,0,0.3)',
+                    shadowHover: '0 8px 24px rgba(0,0,0,0.4)'
+                }
+            }
+        });
+
+        // PAGE ACCUEIL
+        const accueilPage = new Page('accueil');
+        
+        accueilPage.add(new NavBar({
+            logo: "Roule Galette",
+            logoSize: "large",
+            themeToggle: true,
+            pageNavigation: true
+        }));
+
+        accueilPage.add(new HeroBanner("Crêperie Traiteur en Savoie", {
+            subtitle: "Des galettes et crêpes authentiques pour tous vos événements",
+            bgImage: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80",
+            height: "80vh",
+            buttons: [
+                { title: "Découvrir nos services", link: "services", primary: true },
+                { title: "Nous contacter", link: "contact", primary: false }
+            ]
+        }));
+
+        accueilPage.add(new FeatureGrid("Pourquoi choisir Roule Galette ?", {
+            items: [
+                {
+                    icon: "⚡",
+                    title: "Réactivité",
+                    description: "Nous répondons rapidement à vos demandes et nous adaptons à vos contraintes."
+                },
+                {
+                    icon: "🏆",
+                    title: "Qualité de service",
+                    description: "Des produits frais et authentiques préparés avec passion et savoir-faire."
+                },
+                {
+                    icon: "🤝",
+                    title: "Partenariat durable",
+                    description: "Nous construisons une relation de confiance sur le long terme avec nos clients."
+                }
+            ]
+        }));
+
+        accueilPage.add(new TextSection("Notre Histoire", 
+            `<p>Roule Galette est née de la passion pour la cuisine traditionnelle bretonne et savoyarde. Spécialisés dans les crêpes et galettes authentiques, nous mettons notre savoir-faire au service de vos événements.</p>
+            <p>Que ce soit pour un anniversaire, un séminaire d'entreprise ou un brunch entre amis, nous créons des moments gourmands inoubliables avec des produits de qualité et un service personnalisé.</p>
+            <p>Notre équipe expérimentée s'adapte à vos besoins et votre budget pour faire de votre événement un succès culinaire.</p>`, 
+            { alignment: 'center', maxWidth: '700px' }
+        ));
+
+        accueilPage.add(new Testimonials("Ils nous font confiance", {
+            items: [
+                {
+                    clientName: "Marie Dubois",
+                    grade: 5,
+                    comment: "Un service exceptionnel pour l'anniversaire de ma fille ! Les crêpes étaient délicieuses et l'équipe très professionnelle."
+                },
+                {
+                    clientName: "Jean-Luc Martin",
+                    grade: 5,
+                    comment: "Parfait pour notre séminaire d'entreprise. Les galettes salées ont fait l'unanimité auprès de nos collaborateurs."
+                },
+                {
+                    clientName: "Sophie Rousseau",
+                    grade: 4,
+                    comment: "Service impeccable et produits de qualité. Je recommande vivement pour vos événements !"
+                }
+            ]
+        }));
+
+        accueilPage.add(new CTA("Prêt à organiser votre événement ?", {
+            subtitle: "Contactez-nous pour un devis personnalisé",
+            buttons: [
+                { title: "Demander un devis", link: "contact", primary: true },
+                { title: "Voir nos services", link: "services", primary: false }
+            ]
+        }));
+
+        accueilPage.add(new Footer({
+            copyright: "© 2024 Roule Galette. Tous droits réservés.",
+            links: [
+                { title: "Mentions légales", href: "#" },
+                { title: "CGV", href: "#" },
+                { title: "Contact", href: "#contact" }
+            ],
+            social: [
+                { name: "Facebook", link: "#" },
+                { name: "Instagram", link: "#" }
+            ]
+        }));
+
+        // PAGE SERVICES
+        const servicesPage = new Page('services');
+        
+        servicesPage.add(new NavBar({
+            logo: "Roule Galette",
+            logoSize: "large",
+            themeToggle: true,
+            pageNavigation: true
+        }));
+
+        servicesPage.add(new HeroBanner("Nos Services", {
+            subtitle: "Des prestations sur mesure pour tous vos événements",
+            bgImage: "https://images.unsplash.com/photo-1551218808-94e220e084d2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80",
+            height: "60vh"
+        }));
+
+        servicesPage.add(new FeatureGrid("Nos Prestations", {
+            items: [
+                {
+                    icon: "🎂",
+                    title: "Anniversaires",
+                    description: "Crêpes sucrées et salées pour faire plaisir à tous les invités, petits et grands."
+                },
+                {
+                    icon: "💼",
+                    title: "Événements d'entreprise",
+                    description: "Séminaires, réunions, pot de départ - une prestation professionnelle adaptée."
+                },
+                {
+                    icon: "🥞",
+                    title: "Brunchs",
+                    description: "Crêpes gourmandes pour vos brunchs entre amis ou en famille."
+                },
+                {
+                    icon: "🎪",
+                    title: "Fêtes et célébrations",
+                    description: "Mariages, baptêmes, communions - nous accompagnons tous vos moments festifs."
+                },
+                {
+                    icon: "🏫",
+                    title: "Événements scolaires",
+                    description: "Kermesses, fêtes d'école, repas de classe - des prestations adaptées."
+                },
+                {
+                    icon: "🎭",
+                    title: "Festivals et marchés",
+                    description: "Présence sur les marchés locaux et événements festifs en Savoie."
+                }
+            ]
+        }));
+
+        servicesPage.add(new TextSection("Comment ça marche ?", 
+            `<h3>1. Contact initial</h3>
+            <p>Contactez-nous par téléphone ou email pour nous présenter votre projet.</p>
+            
+            <h3>2. Échange personnalisé</h3>
+            <p>Nous discutons ensemble de vos besoins, du nombre d'invités, du budget et des contraintes.</p>
+            
+            <h3>3. Devis sur mesure</h3>
+            <p>Nous vous proposons une formule adaptée parfaitement à vos attentes.</p>
+            
+            <h3>4. Réalisation</h3>
+            <p>Le jour J, notre équipe se charge de tout pour un événement réussi !</p>`, 
+            { alignment: 'left', maxWidth: '800px' }
+        ));
+
+        servicesPage.add(new Footer({
+            copyright: "© 2024 Roule Galette. Tous droits réservés."
+        }));
+
+        // PAGE GALERIE
+        const galeriePage = new Page('galerie');
+        
+        galeriePage.add(new NavBar({
+            logo: "Roule Galette",
+            logoSize: "large",
+            themeToggle: true,
+            pageNavigation: true
+        }));
+
+        galeriePage.add(new HeroBanner("Notre Galerie", {
+            subtitle: "Découvrez nos réalisations et nos spécialités",
+            bgImage: "https://images.unsplash.com/photo-1506459225024-1428097a7e18?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80",
+            height: "50vh"
+        }));
+
+        galeriePage.add(new Gallery("Nos Créations", {
+            images: [
+                "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                "https://images.unsplash.com/photo-1551218808-94e220e084d2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                "https://images.unsplash.com/photo-1506459225024-1428097a7e18?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                "https://images.unsplash.com/photo-1573225342350-16731dd9bf3d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                "https://images.unsplash.com/photo-1571115764595-644a1f56a55c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                "https://images.unsplash.com/photo-1562059390-a761a084768e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+            ]
+        }));
+
+        galeriePage.add(new Footer({
+            copyright: "© 2024 Roule Galette. Tous droits réservés."
+        }));
+
+        // PAGE ÉQUIPE
+        const equipePage = new Page('equipe');
+        
+        equipePage.add(new NavBar({
+            logo: "Roule Galette",
+            logoSize: "large",
+            themeToggle: true,
+            pageNavigation: true
+        }));
+
+        equipePage.add(new HeroBanner("Notre Équipe", {
+            subtitle: "Les artisans de votre plaisir gustatif",
+            bgImage: "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80",
+            height: "50vh"
+        }));
+
+        equipePage.add(new TeamSection("Rencontrez notre équipe", {
+            subtitle: "Des passionnés au service de vos événements",
+            members: [
+                {
+                    name: "Pierre Galette",
+                    role: "Chef Crêpier - Fondateur",
+                    description: "Passionné de cuisine bretonne depuis 15 ans, Pierre met son savoir-faire au service de vos événements.",
+                    image: "https://images.unsplash.com/photo-1566492031773-4f4e44671d66?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+                },
+                {
+                    name: "Marie Blé",
+                    role: "Responsable Événementiel",
+                    description: "Organisatrice hors pair, Marie coordonne vos événements pour une prestation parfaite.",
+                    image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+                },
+                {
+                    name: "Julien Sarrasin",
+                    role: "Chef de Service",
+                    description: "Expert en service client, Julien veille à ce que votre expérience soit inoubliable.",
+                    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
+                }
+            ]
+        }));
+
+        equipePage.add(new Footer({
+            copyright: "© 2024 Roule Galette. Tous droits réservés."
+        }));
+
+        // PAGE CONTACT
+        const contactPage = new Page('contact');
+        
+        contactPage.add(new NavBar({
+            logo: "Roule Galette",
+            logoSize: "large",
+            themeToggle: true,
+            pageNavigation: true
+        }));
+
+        contactPage.add(new HeroBanner("Contactez-nous", {
+            subtitle: "Parlons de votre projet ensemble",
+            bgColor: "#ffde4f",
+            height: "50vh"
+        }));
+
+        contactPage.add(new ContactForm("Demande de devis", {
+            subtitle: "Décrivez-nous votre événement pour recevoir un devis personnalisé",
+            fields: [
+                { type: 'text', name: 'nom', label: 'Nom et Prénom', required: true },
+                { type: 'email', name: 'email', label: 'Email', required: true },
+                { type: 'tel', name: 'telephone', label: 'Téléphone', required: false },
+                { type: 'text', name: 'evenement', label: "Type d'événement", required: true },
+                { type: 'number', name: 'invites', label: "Nombre d'invités", required: true },
+                { type: 'date', name: 'date', label: 'Date souhaitée', required: true },
+                { type: 'textarea', name: 'message', label: 'Détails de votre projet', required: true }
+            ],
+            buttonText: "Envoyer ma demande"
+        }));
+
+        contactPage.add(new FeatureGrid("Nos Coordonnées", {
+            items: [
+                {
+                    icon: "📍",
+                    title: "Adresse",
+                    description: "Zone d'activité de Savoie\n73000 Chambéry et alentours"
+                },
+                {
+                    icon: "📞",
+                    title: "Téléphone",
+                    description: "06 XX XX XX XX\nLundi au samedi : 8h-18h"
+                },
+                {
+                    icon: "✉️",
+                    title: "Email",
+                    description: "contact@roulegalette73.fr\nRéponse sous 24h"
+                }
+            ]
+        }));
+
+        contactPage.add(new Footer({
+            copyright: "© 2024 Roule Galette. Tous droits réservés.",
+            links: [
+                { title: "Mentions légales", href: "#" },
+                { title: "CGV", href: "#" }
+            ],
+            social: [
+                { name: "Facebook", link: "#" },
+                { name: "Instagram", link: "#" }
+            ]
+        }));
+
+        // PAGE MENU
+        const menuPage = new Page('menu');
+        
+        menuPage.add(new NavBar({
+            logo: "Roule Galette",
+            logoSize: "large",
+            themeToggle: true,
+            pageNavigation: true
+        }));
+
+        menuPage.add(new HeroBanner("Notre Carte", {
+            subtitle: "Découvrez nos délicieuses créations sucrées et salées",
+            bgImage: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80",
+            height: "60vh"
+        }));
+
+        menuPage.add(new FeatureGrid("Crêpes Salées", {
+            items: [
+                {
+                    icon: "🧀",
+                    title: "La Complète",
+                    description: "Jambon, œuf, fromage râpé - un classique indémodable"
+                },
+                {
+                    icon: "🥓",
+                    title: "La Savoyarde",
+                    description: "Lardons, reblochon, pommes de terre, oignons"
+                },
+                {
+                    icon: "🍄",
+                    title: "La Forestière",
+                    description: "Champignons, lardons, crème fraîche, persil"
+                },
+                {
+                    icon: "🥬",
+                    title: "La Végétarienne",
+                    description: "Légumes de saison, chèvre, noix, miel"
+                },
+                {
+                    icon: "🐟",
+                    title: "La Marine",
+                    description: "Saumon fumé, crème fraîche, aneth, citron"
+                },
+                {
+                    icon: "🍅",
+                    title: "La Méditerranéenne",
+                    description: "Tomates, mozzarella, basilic, huile d'olive"
+                }
+            ]
+        }));
+
+        menuPage.add(new FeatureGrid("Crêpes Sucrées", {
+            items: [
+                {
+                    icon: "🍯",
+                    title: "Miel & Amandes",
+                    description: "Miel de montagne, amandes effilées grillées"
+                },
+                {
+                    icon: "🍫",
+                    title: "Nutella & Banane",
+                    description: "Pâte à tartiner, bananes fraîches"
+                },
+                {
+                    icon: "🍎",
+                    title: "Pommes Cannelle",
+                    description: "Compotée de pommes maison, cannelle, sucre"
+                },
+                {
+                    icon: "🍓",
+                    title: "Fruits Rouges",
+                    description: "Coulis de fruits rouges, chantilly"
+                },
+                {
+                    icon: "🥥",
+                    title: "Coco Passion",
+                    description: "Noix de coco râpée, coulis de fruit de la passion"
+                },
+                {
+                    icon: "🍋",
+                    title: "Citron Sucré",
+                    description: "Jus de citron frais, sucre en poudre"
+                }
+            ]
+        }));
+
+        menuPage.add(new CTA("Envie d'une création personnalisée ?", {
+            subtitle: "Nous pouvons adapter nos recettes selon vos goûts et restrictions alimentaires",
+            buttons: [
+                { title: "Nous contacter", link: "contact", primary: true }
+            ]
+        }));
+
+        menuPage.add(new Footer({
+            copyright: "© 2024 Roule Galette. Tous droits réservés."
+        }));
+
+        // PAGE TARIFS
+        const tarifsPage = new Page('tarifs');
+        
+        tarifsPage.add(new NavBar({
+            logo: "Roule Galette",
+            logoSize: "large",
+            themeToggle: true,
+            pageNavigation: true
+        }));
+
+        tarifsPage.add(new HeroBanner("Nos Tarifs", {
+            subtitle: "Des prestations adaptées à tous les budgets",
+            bgColor: "#ffde4f",
+            height: "50vh"
+        }));
+
+        tarifsPage.add(new PricingTable("Forfaits Événements", {
+            plans: [
+                {
+                    title: "Formule Essentielle",
+                    price: "8",
+                    currency: "€",
+                    period: "personne",
+                    description: "Parfait pour les petits événements familiaux",
+                    features: [
+                        "2 crêpes salées au choix",
+                        "1 crêpe sucrée",
+                        "Boisson incluse",
+                        "Service à table",
+                        "Minimum 10 personnes"
+                    ],
+                    buttonText: "Choisir cette formule",
+                    buttonLink: "contact"
+                },
+                {
+                    title: "Formule Gourmande",
+                    price: "12",
+                    currency: "€",
+                    period: "personne",
+                    description: "Notre formule la plus populaire",
+                    features: [
+                        "3 crêpes salées au choix",
+                        "2 crêpes sucrées",
+                        "Boissons à volonté",
+                        "Service premium",
+                        "Décoration de table",
+                        "Minimum 15 personnes"
+                    ],
+                    buttonText: "Choisir cette formule",
+                    buttonLink: "contact",
+                    featured: true
+                },
+                {
+                    title: "Formule Prestige",
+                    price: "18",
+                    currency: "€",
+                    period: "personne",
+                    description: "Pour vos événements d'exception",
+                    features: [
+                        "Crêpes à volonté",
+                        "Crêpes signature exclusives",
+                        "Bar à garnitures",
+                        "Service personnalisé",
+                        "Décoration premium",
+                        "Animation crêpier",
+                        "Minimum 20 personnes"
+                    ],
+                    buttonText: "Choisir cette formule",
+                    buttonLink: "contact"
+                }
+            ]
+        }));
+
+        tarifsPage.add(new TextSection("Informations Tarifaires", 
+            `<h3>💡 Tarifs à partir de</h3>
+            <p>Les prix indiqués sont nos tarifs de base. Le devis final peut varier selon :</p>
+            <ul>
+                <li>Le lieu de votre événement (déplacement)</li>
+                <li>Le jour et l'horaire choisis</li>
+                <li>Les options supplémentaires demandées</li>
+                <li>Le nombre exact de participants</li>
+            </ul>
+            
+            <h3>📅 Réservation</h3>
+            <p>Nous recommandons de réserver au moins 2 semaines à l'avance pour garantir notre disponibilité.</p>
+            
+            <h3>💳 Modalités de paiement</h3>
+            <p>Acompte de 30% à la réservation, solde le jour J. Paiement par chèque, virement ou espèces.</p>`, 
+            { alignment: 'left', maxWidth: '700px' }
+        ));
+
+        tarifsPage.add(new Footer({
+            copyright: "© 2024 Roule Galette. Tous droits réservés."
+        }));
+
+        // PAGE À PROPOS
+        const aproposPage = new Page('apropos');
+        
+        aproposPage.add(new NavBar({
+            logo: "Roule Galette",
+            logoSize: "large",
+            themeToggle: true,
+            pageNavigation: true
+        }));
+
+        aproposPage.add(new HeroBanner("À Propos de Roule Galette", {
+            subtitle: "L'histoire d'une passion pour la crêpe authentique",
+            bgImage: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80",
+            height: "60vh"
+        }));
+
+        aproposPage.add(new StatsSection("Roule Galette en chiffres", {
+            stats: [
+                { number: "500", suffix: "+", label: "Événements réalisés" },
+                { number: "15000", suffix: "+", label: "Crêpes servies" },
+                { number: "8", label: "Années d'expérience" },
+                { number: "98", suffix: "%", label: "Clients satisfaits" }
+            ]
+        }));
+
+        aproposPage.add(new Timeline("Notre Histoire", {
+            events: [
+                {
+                    date: "2016",
+                    title: "Les Débuts",
+                    description: "Pierre découvre sa passion pour la crêpe lors d'un voyage en Bretagne"
+                },
+                {
+                    date: "2018",
+                    title: "Création de l'Entreprise",
+                    description: "Lancement officiel de Roule Galette en Savoie"
+                },
+                {
+                    date: "2020",
+                    title: "Expansion de l'Équipe",
+                    description: "Marie et Julien rejoignent l'aventure"
+                },
+                {
+                    date: "2022",
+                    title: "500e Événement",
+                    description: "Célébration de notre 500e prestation avec une fête mémorable"
+                },
+                {
+                    date: "2024",
+                    title: "Nouveaux Horizons",
+                    description: "Lancement de nouvelles formules et extension de notre zone d'intervention"
+                }
+            ]
+        }));
+
+        aproposPage.add(new TextSection("Nos Valeurs", 
+            `<h3>🌱 Produits Locaux</h3>
+            <p>Nous privilégions les producteurs locaux de Savoie pour nos ingrédients : farine de blé noir, œufs fermiers, fromages de montagne.</p>
+            
+            <h3>🎯 Qualité Artisanale</h3>
+            <p>Chaque crêpe est préparée à la minute selon des recettes traditionnelles transmises de génération en génération.</p>
+            
+            <h3>💚 Respect de l'Environnement</h3>
+            <p>Nous utilisons des emballages biodégradables et minimisons notre impact écologique lors de nos déplacements.</p>
+            
+            <h3>🤝 Service Personnalisé</h3>
+            <p>Chaque client est unique, c'est pourquoi nous adaptons nos prestations à vos besoins spécifiques.</p>`, 
+            { alignment: 'center', maxWidth: '800px' }
+        ));
+
+        aproposPage.add(new Footer({
+            copyright: "© 2024 Roule Galette. Tous droits réservés."
+        }));
+
+        // PAGE FAQ
+        const faqPage = new Page('faq');
+        
+        faqPage.add(new NavBar({
+            logo: "Roule Galette",
+            logoSize: "large",
+            themeToggle: true,
+            pageNavigation: true
+        }));
+
+        faqPage.add(new HeroBanner("Questions Fréquentes", {
+            subtitle: "Toutes les réponses à vos questions sur nos prestations",
+            bgColor: "#f8f9fa",
+            textColor: "dark",
+            height: "50vh"
+        }));
+
+        faqPage.add(new FAQ("Foire Aux Questions", {
+            subtitle: "Vous ne trouvez pas la réponse à votre question ? Contactez-nous !",
+            questions: [
+                {
+                    question: "Combien de temps à l'avance faut-il réserver ?",
+                    answer: "Nous recommandons de réserver au moins 2 semaines à l'avance, surtout pour les weekends et périodes de forte demande. Pour les événements importants (+ 50 personnes), 1 mois d'avance est préférable."
+                },
+                {
+                    question: "Dans quelles zones intervenez-vous ?",
+                    answer: "Nous nous déplaçons dans toute la Savoie et les départements limitrophes. Pour les déplacements de plus de 50 km, des frais de transport peuvent s'appliquer."
+                },
+                {
+                    question: "Proposez-vous des options végétariennes/véganes ?",
+                    answer: "Absolument ! Nous avons plusieurs recettes végétariennes et pouvons adapter nos crêpes pour les régimes véganes, sans gluten ou autres restrictions alimentaires. Précisez-nous vos besoins lors de la réservation."
+                },
+                {
+                    question: "Que se passe-t-il en cas de mauvais temps ?",
+                    answer: "Nous nous adaptons aux conditions météorologiques. Nous disposons de matériel de protection et pouvons nous installer en intérieur si nécessaire. Le mauvais temps n'arrête pas les crêpes !"
+                },
+                {
+                    question: "Peut-on annuler ou reporter un événement ?",
+                    answer: "Oui, nous comprenons que les imprévu arrivent. L'annulation est possible jusqu'à 48h avant l'événement. Au-delà, l'acompte reste acquis, sauf cas de force majeure."
+                },
+                {
+                    question: "Fournissez-vous les boissons ?",
+                    answer: "Selon la formule choisie, nous pouvons inclure des boissons chaudes (café, thé, chocolat chaud) et froides (jus, sodas). L'alcool n'est pas fourni mais nous pouvons vous recommander des partenaires."
+                },
+                {
+                    question: "Combien de crêpes mangez-vous en moyenne par personne ?",
+                    answer: "En moyenne, nous comptons 3-4 crêpes salées et 2-3 sucrées par adulte. Cela varie selon l'âge des invités, l'heure du repas et la durée de l'événement."
+                },
+                {
+                    question: "Proposez-vous des animations ?",
+                    answer: "Oui ! Nos crêpiers peuvent expliquer leur savoir-faire, faire participer vos invités à la préparation, et créer une ambiance conviviale autour de la crêpière."
+                }
+            ]
+        }));
+
+        faqPage.add(new CTA("Une autre question ?", {
+            subtitle: "Notre équipe est là pour vous renseigner",
+            buttons: [
+                { title: "Nous contacter", link: "contact", primary: true }
+            ]
+        }));
+
+        faqPage.add(new Footer({
+            copyright: "© 2024 Roule Galette. Tous droits réservés."
+        }));
+
+        // Enhance existing pages with new content
+        accueilPage.sections.splice(3, 0, new StatsSection("", {
+            stats: [
+                { number: "500", suffix: "+", label: "Événements réalisés" },
+                { number: "98", suffix: "%", label: "Clients satisfaits" },
+                { number: "8", label: "Ans d'expérience" },
+                { number: "24h", label: "Délai de réponse" }
+            ]
+        }));
+
+        // Add VideoSection to services page (placeholder for demo)
+        servicesPage.sections.splice(2, 0, new VideoSection("Découvrez notre savoir-faire", 
+            "https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4", {
+            subtitle: "Plongez dans l'univers de la crêpe artisanale",
+            poster: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+        }));
+
+        // Add FAQ to contact page
+        contactPage.sections.splice(-2, 0, new FAQ("Questions Rapides", {
+            questions: [
+                {
+                    question: "Quel est votre délai de réponse ?",
+                    answer: "Nous répondons à tous les devis dans les 24h ouvrées."
+                },
+                {
+                    question: "Le devis est-il gratuit ?",
+                    answer: "Oui, tous nos devis sont gratuits et sans engagement."
+                },
+                {
+                    question: "Peut-on vous rencontrer avant l'événement ?",
+                    answer: "Bien sûr ! Nous pouvons organiser une rencontre pour discuter de votre projet."
+                }
+            ]
+        }));
+
+        // Add all pages to website
+        website.add(accueilPage);
+        website.add(servicesPage);
+        website.add(menuPage);
+        website.add(tarifsPage);
+        website.add(galeriePage);
+        website.add(equipePage);
+        website.add(aproposPage);
+        website.add(faqPage);
+        website.add(contactPage);
+
+        // Display website
+        website.display('body');
+    </script>
+</body>
+</html>

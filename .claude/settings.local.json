@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:roulegalette73.fr)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
