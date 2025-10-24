@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordPress Manager - Admin Panel</title>
+    <script src="builder.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Top bar custom styles */
+        .topbar-content {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .topbar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .topbar-search {
+            position: relative;
+        }
+
+        .topbar-search input {
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            background-color: var(--bg-alt);
+            color: var(--text-color);
+            width: 300px;
+        }
+
+        .topbar-search::before {
+            content: '🔍';
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+
+        .topbar-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .topbar-notifications {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.3rem;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #e74c3c;
+            color: white;
+            font-size: 0.65rem;
+            padding: 2px 5px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-badge--active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge--inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-badge--warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-badge--success {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        /* Activity chart placeholder */
+        .activity-chart {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(180deg, rgba(108, 99, 255, 0.1) 0%, rgba(108, 99, 255, 0.05) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Quick actions grid */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .quick-action-btn {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .quick-action-btn:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .quick-action-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .quick-action-title {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Sample data for WordPress sites
+        const wordpressSites = [
+            {
+                id: 1,
+                name: 'My Blog',
+                domain: 'myblog.com',
+                status: 'Active',
+                version: '6.4.2',
+                lastBackup: '2 hours ago',
+                storage: '1.2 GB',
+                visitors: '1,234'
+            },
+            {
+                id: 2,
+                name: 'E-commerce Store',
+                domain: 'mystore.com',
+                status: 'Active',
+                version: '6.4.2',
+                lastBackup: '1 day ago',
+                storage: '3.8 GB',
+                visitors: '5,678'
+            },
+            {
+                id: 3,
+                name: 'Portfolio Site',
+                domain: 'portfolio.net',
+                status: 'Inactive',
+                version: '6.3.1',
+                lastBackup: '5 days ago',
+                storage: '450 MB',
+                visitors: '234'
+            },
+            {
+                id: 4,
+                name: 'Company Website',
+                domain: 'company.com',
+                status: 'Active',
+                version: '6.4.2',
+                lastBackup: '3 hours ago',
+                storage: '2.1 GB',
+                visitors: '3,456'
+            },
+            {
+                id: 5,
+                name: 'News Portal',
+                domain: 'news.org',
+                status: 'Warning',
+                version: '6.2.0',
+                lastBackup: '12 days ago',
+                storage: '5.4 GB',
+                visitors: '12,345'
+            }
+        ];
+
+        // Plugin data
+        const plugins = [
+            {
+                name: 'Yoast SEO',
+                version: '21.5',
+                status: 'Active',
+                sites: 12,
+                lastUpdate: '2 days ago'
+            },
+            {
+                name: 'WooCommerce',
+                version: '8.4.0',
+                status: 'Active',
+                sites: 5,
+                lastUpdate: '1 week ago'
+            },
+            {
+                name: 'Elementor',
+                version: '3.18.2',
+                status: 'Active',
+                sites: 8,
+                lastUpdate: '3 days ago'
+            },
+            {
+                name: 'Contact Form 7',
+                version: '5.8.4',
+                status: 'Active',
+                sites: 15,
+                lastUpdate: '1 month ago'
+            },
+            {
+                name: 'WP Super Cache',
+                version: '1.11.0',
+                status: 'Inactive',
+                sites: 3,
+                lastUpdate: '2 weeks ago'
+            }
+        ];
+
+        // Create sidebar navigation
+        const sidebar = new Sidebar({
+            logo: 'WP Manager',
+            items: [
+                { icon: '📊', title: 'Dashboard', active: true, onClick: () => showDashboard() },
+                { icon: '🌐', title: 'Websites', onClick: () => showWebsites() },
+                { icon: '🔌', title: 'Plugins', onClick: () => showPlugins() },
+                { icon: '🎨', title: 'Themes', onClick: () => showThemes() },
+                { separator: true, label: 'Management' },
+                { icon: '📦', title: 'Backups', badge: '3', onClick: () => showBackups() },
+                { icon: '🔄', title: 'Updates', badge: '5', onClick: () => showUpdates() },
+                { icon: '👥', title: 'Users', onClick: () => showUsers() },
+                { icon: '📈', title: 'Analytics', onClick: () => showAnalytics() },
+                { separator: true, label: 'System' },
+                { icon: '⚙️', title: 'Settings', onClick: () => showSettings() },
+                { icon: '🔐', title: 'Security', onClick: () => showSecurity() },
+                { icon: '📝', title: 'Logs', onClick: () => showLogs() }
+            ]
+        });
+
+        // Create top bar
+        const topBar = document.createElement('div');
+        topBar.className = 'topbar-content';
+        topBar.innerHTML = `
+            <div class="topbar-title">Dashboard</div>
+            <div class="topbar-right">
+                <div class="topbar-search">
+                    <input type="text" placeholder="Search websites, plugins...">
+                </div>
+                <div class="topbar-notifications">
+                    🔔
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="topbar-user">
+                    <div class="topbar-avatar">JD</div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.875rem; color: var(--text-color);">John Doe</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Administrator</div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Dashboard content
+        function createDashboardContent() {
+            return [
+                // Stats cards
+                new CardGrid({
+                    cards: [
+                        {
+                            icon: '🌐',
+                            title: 'Total Websites',
+                            value: '15',
+                            subtitle: '3 added this month',
+                            variant: 'info'
+                        },
+                        {
+                            icon: '✅',
+                            title: 'Active Sites',
+                            value: '12',
+                            subtitle: '80% uptime',
+                            variant: 'success'
+                        },
+                        {
+                            icon: '⚠️',
+                            title: 'Needs Attention',
+                            value: '3',
+                            subtitle: 'Updates available',
+                            variant: 'warning'
+                        },
+                        {
+                            icon: '💾',
+                            title: 'Total Storage',
+                            value: '24.5 GB',
+                            subtitle: '35% of 70 GB',
+                            variant: 'default'
+                        }
+                    ]
+                }),
+
+                // Recent Activity
+                new AdminSection('Recent Activity', {
+                    content: [
+                        new Card({
+                            content: `<div class="activity-chart">Activity Chart - Integration with Chart.js</div>`
+                        })
+                    ]
+                }),
+
+                // Quick Actions
+                new AdminSection('Quick Actions', {
+                    content: [`
+                        <div class="quick-actions">
+                            <div class="quick-action-btn" onclick="alert('Add new website')">
+                                <div class="quick-action-icon">➕</div>
+                                <div class="quick-action-title">Add Website</div>
+                            </div>
+                            <div class="quick-action-btn" onclick="alert('Run backup')">
+                                <div class="quick-action-icon">💾</div>
+                                <div class="quick-action-title">Run Backup</div>
+                            </div>
+                            <div class="quick-action-btn" onclick="alert('Check updates')">
+                                <div class="quick-action-icon">🔄</div>
+                                <div class="quick-action-title">Check Updates</div>
+                            </div>
+                            <div class="quick-action-btn" onclick="alert('View reports')">
+                                <div class="quick-action-icon">📊</div>
+                                <div class="quick-action-title">View Reports</div>
+                            </div>
+                        </div>
+                    `]
+                }),
+
+                // Recent Websites
+                new AdminSection('Recent Websites', {
+                    actions: [
+                        { title: 'View All', primary: false, onClick: () => showWebsites() }
+                    ],
+                    content: [
+                        new DataTable({
+                            columns: [
+                                { key: 'name', title: 'Name' },
+                                { key: 'domain', title: 'Domain' },
+                                {
+                                    key: 'status',
+                                    title: 'Status',
+                                    render: (value) => {
+                                        const variant = value === 'Active' ? 'active' : value === 'Warning' ? 'warning' : 'inactive';
+                                        return `<span class="status-badge status-badge--${variant}">${value}</span>`;
+                                    }
+                                },
+                                { key: 'visitors', title: 'Visitors' }
+                            ],
+                            data: wordpressSites.slice(0, 5),
+                            searchable: false,
+                            pagination: false,
+                            actions: [
+                                { title: 'Manage', variant: 'default', onClick: (row) => alert(`Managing ${row.name}`) },
+                                { title: 'Visit', variant: 'success', onClick: (row) => alert(`Visiting ${row.domain}`) }
+                            ]
+                        })
+                    ]
+                })
+            ];
+        }
+
+        // Websites page content
+        function createWebsitesContent() {
+            return [
+                new AdminSection('All WordPress Websites', {
+                    actions: [
+                        { title: 'Add New Website', primary: true, onClick: () => alert('Add new website form') },
+                        { title: 'Import', primary: false, onClick: () => alert('Import websites') }
+                    ],
+                    content: [
+                        new DataTable({
+                            columns: [
+                                { key: 'name', title: 'Name' },
+                                { key: 'domain', title: 'Domain' },
+                                {
+                                    key: 'status',
+                                    title: 'Status',
+                                    render: (value) => {
+                                        const variant = value === 'Active' ? 'active' : value === 'Warning' ? 'warning' : 'inactive';
+                                        return `<span class="status-badge status-badge--${variant}">${value}</span>`;
+                                    }
+                                },
+                                { key: 'version', title: 'WP Version' },
+                                { key: 'lastBackup', title: 'Last Backup' },
+                                { key: 'storage', title: 'Storage' },
+                                { key: 'visitors', title: 'Visitors/day' }
+                            ],
+                            data: wordpressSites,
+                            actions: [
+                                { title: 'Dashboard', variant: 'default', onClick: (row) => alert(`Dashboard for ${row.name}`) },
+                                { title: 'Settings', variant: 'default', onClick: (row) => alert(`Settings for ${row.name}`) },
+                                { title: 'Delete', variant: 'danger', onClick: (row) => confirm(`Delete ${row.name}?`) }
+                            ]
+                        })
+                    ]
+                }),
+
+                new CardGrid({
+                    cards: [
+                        {
+                            title: 'Storage Usage',
+                            content: `
+                                <div style="margin: 1rem 0;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                        <span>24.5 GB / 70 GB</span>
+                                        <span>35%</span>
+                                    </div>
+                                    <div style="width: 100%; height: 8px; background: var(--bg-alt); border-radius: 4px; overflow: hidden;">
+                                        <div style="width: 35%; height: 100%; background: var(--primary-color);"></div>
+                                    </div>
+                                </div>
+                            `
+                        },
+                        {
+                            title: 'Total Bandwidth',
+                            content: `
+                                <div style="margin: 1rem 0;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                        <span>145 GB / 500 GB</span>
+                                        <span>29%</span>
+                                    </div>
+                                    <div style="width: 100%; height: 8px; background: var(--bg-alt); border-radius: 4px; overflow: hidden;">
+                                        <div style="width: 29%; height: 100%; background: #2ecc71;"></div>
+                                    </div>
+                                </div>
+                            `
+                        }
+                    ]
+                })
+            ];
+        }
+
+        // Plugins page content
+        function createPluginsContent() {
+            return [
+                new AdminSection('Installed Plugins', {
+                    actions: [
+                        { title: 'Add New Plugin', primary: true, onClick: () => alert('Add plugin') },
+                        { title: 'Update All', primary: false, onClick: () => alert('Update all plugins') }
+                    ],
+                    content: [
+                        new DataTable({
+                            columns: [
+                                { key: 'name', title: 'Plugin Name' },
+                                { key: 'version', title: 'Version' },
+                                {
+                                    key: 'status',
+                                    title: 'Status',
+                                    render: (value) => {
+                                        const variant = value === 'Active' ? 'active' : 'inactive';
+                                        return `<span class="status-badge status-badge--${variant}">${value}</span>`;
+                                    }
+                                },
+                                { key: 'sites', title: 'Active Sites' },
+                                { key: 'lastUpdate', title: 'Last Update' }
+                            ],
+                            data: plugins,
+                            actions: [
+                                { title: 'Configure', variant: 'default', onClick: (row) => alert(`Configure ${row.name}`) },
+                                { title: 'Deactivate', variant: 'default', onClick: (row) => alert(`Deactivate ${row.name}`) },
+                                { title: 'Delete', variant: 'danger', onClick: (row) => confirm(`Delete ${row.name}?`) }
+                            ]
+                        })
+                    ]
+                }),
+
+                new CardGrid({
+                    cards: [
+                        { icon: '🔌', title: 'Total Plugins', value: '47', subtitle: '5 updates available' },
+                        { icon: '✅', title: 'Active', value: '38', subtitle: '81% activation rate' },
+                        { icon: '💤', title: 'Inactive', value: '9', subtitle: 'Consider cleanup' }
+                    ]
+                })
+            ];
+        }
+
+        // Navigation functions
+        let currentContent = 'dashboard';
+
+        function updateContent(contentType, contentArray, title) {
+            currentContent = contentType;
+
+            // Update topbar title
+            document.querySelector('.topbar-title').textContent = title;
+
+            // Create new layout
+            const layout = new AdminLayout({
+                sidebar: sidebar,
+                topBar: topBar,
+                content: contentArray
+            });
+
+            // Replace body content
+            document.body.innerHTML = '';
+            document.body.appendChild(layout.render());
+        }
+
+        function showDashboard() {
+            updateContent('dashboard', createDashboardContent(), 'Dashboard');
+        }
+
+        function showWebsites() {
+            updateContent('websites', createWebsitesContent(), 'Websites');
+        }
+
+        function showPlugins() {
+            updateContent('plugins', createPluginsContent(), 'Plugins');
+        }
+
+        function showThemes() {
+            updateContent('themes', [
+                new AdminSection('Themes', {
+                    actions: [{ title: 'Add New Theme', primary: true, onClick: () => alert('Add theme') }],
+                    content: [new Card({ content: '<p>Theme management interface coming soon...</p>' })]
+                })
+            ], 'Themes');
+        }
+
+        function showBackups() {
+            updateContent('backups', [
+                new AdminSection('Backup Management', {
+                    actions: [
+                        { title: 'Create Backup', primary: true, onClick: () => alert('Create backup') },
+                        { title: 'Schedule', primary: false, onClick: () => alert('Schedule backups') }
+                    ],
+                    content: [
+                        new CardGrid({
+                            cards: [
+                                { icon: '💾', title: 'Total Backups', value: '127', subtitle: '2.3 TB total size', variant: 'info' },
+                                { icon: '✅', title: 'Last Successful', value: '2h ago', subtitle: 'All sites backed up', variant: 'success' },
+                                { icon: '📅', title: 'Scheduled', value: 'Daily', subtitle: 'Next: Tonight 2 AM', variant: 'default' }
+                            ]
+                        }),
+                        new Card({ content: '<p>Recent backups list with restore options would be displayed here.</p>' })
+                    ]
+                })
+            ], 'Backups');
+        }
+
+        function showUpdates() {
+            updateContent('updates', [
+                new AdminSection('Available Updates', {
+                    actions: [{ title: 'Update All', primary: true, onClick: () => alert('Update all') }],
+                    content: [
+                        new Card({
+                            title: 'WordPress Core Updates',
+                            content: '<ul style="list-style: none; padding: 0;"><li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color);">⬆️ WordPress 6.4.2 → 6.4.3</li><li style="padding: 0.5rem 0;">🔒 Security patch available</li></ul>'
+                        }),
+                        new Card({
+                            title: 'Plugin Updates',
+                            content: '<p>5 plugins have updates available. Click "Update All" to install them safely.</p>'
+                        })
+                    ]
+                })
+            ], 'Updates');
+        }
+
+        function showUsers() {
+            updateContent('users', [
+                new AdminSection('User Management', {
+                    actions: [{ title: 'Add User', primary: true, onClick: () => alert('Add user') }],
+                    content: [new Card({ content: '<p>User management interface with roles and permissions...</p>' })]
+                })
+            ], 'Users');
+        }
+
+        function showAnalytics() {
+            updateContent('analytics', [
+                new AdminSection('Analytics Overview', {
+                    content: [
+                        new CardGrid({
+                            cards: [
+                                { icon: '👥', title: 'Total Visitors', value: '45,234', subtitle: '+12% this month' },
+                                { icon: '📄', title: 'Page Views', value: '125,678', subtitle: '+8% this month' },
+                                { icon: '⏱️', title: 'Avg. Session', value: '3m 24s', subtitle: '+5% this month' },
+                                { icon: '🎯', title: 'Bounce Rate', value: '42%', subtitle: '-3% this month' }
+                            ]
+                        }),
+                        new Card({ content: '<div class="activity-chart">Analytics Charts - Integration with Chart.js</div>' })
+                    ]
+                })
+            ], 'Analytics');
+        }
+
+        function showSettings() {
+            updateContent('settings', [
+                new AdminSection('System Settings', {
+                    actions: [{ title: 'Save Changes', primary: true, onClick: () => alert('Settings saved') }],
+                    content: [
+                        new Card({
+                            title: 'General Settings',
+                            content: '<p>Configure system-wide settings, email notifications, backup schedules, and more...</p>'
+                        }),
+                        new Card({
+                            title: 'API Configuration',
+                            content: '<p>Manage API keys and integrations with third-party services...</p>'
+                        })
+                    ]
+                })
+            ], 'Settings');
+        }
+
+        function showSecurity() {
+            updateContent('security', [
+                new AdminSection('Security Center', {
+                    content: [
+                        new CardGrid({
+                            cards: [
+                                { icon: '🔒', title: 'Security Score', value: '95/100', subtitle: 'Excellent', variant: 'success' },
+                                { icon: '🛡️', title: 'Firewall', value: 'Active', subtitle: '12 threats blocked today', variant: 'success' },
+                                { icon: '⚠️', title: 'Vulnerabilities', value: '2', subtitle: 'Requires attention', variant: 'warning' }
+                            ]
+                        }),
+                        new Card({
+                            title: 'Recent Security Events',
+                            content: '<p>Login attempts, blocked IPs, and security alerts would be listed here...</p>'
+                        })
+                    ]
+                })
+            ], 'Security');
+        }
+
+        function showLogs() {
+            updateContent('logs', [
+                new AdminSection('System Logs', {
+                    actions: [
+                        { title: 'Clear Old Logs', primary: false, onClick: () => confirm('Clear logs older than 30 days?') },
+                        { title: 'Export', primary: false, onClick: () => alert('Export logs') }
+                    ],
+                    content: [
+                        new Card({
+                            content: `
+                                <div style="font-family: monospace; font-size: 0.875rem; max-height: 400px; overflow-y: auto;">
+                                    <div style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color);">[2024-01-15 14:32:15] INFO: Backup completed for myblog.com</div>
+                                    <div style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color);">[2024-01-15 14:28:42] INFO: Plugin updated: Yoast SEO → 21.5</div>
+                                    <div style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color);">[2024-01-15 14:15:03] WARNING: High CPU usage detected on mystore.com</div>
+                                    <div style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color);">[2024-01-15 14:10:27] INFO: User 'admin' logged in</div>
+                                    <div style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color);">[2024-01-15 13:55:12] ERROR: Failed backup attempt on portfolio.net</div>
+                                    <div style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color);">[2024-01-15 13:42:38] INFO: Security scan completed - No threats found</div>
+                                </div>
+                            `
+                        })
+                    ]
+                })
+            ], 'System Logs');
+        }
+
+        // Initialize with dashboard
+        const layout = new AdminLayout({
+            sidebar: sidebar,
+            topBar: topBar,
+            content: createDashboardContent()
+        });
+
+        document.body.appendChild(layout.render());
+    </script>
+</body>
+</html>

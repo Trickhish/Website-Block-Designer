@@ -1473,6 +1473,607 @@ class CTA {
 }
 
 // ============================================
+// ADMIN COMPONENTS
+// ============================================
+
+class Sidebar {
+    constructor(options = {}) {
+        this.options = {
+            logo: options.logo || 'Admin Panel',
+            logoImage: options.logoImage || null,
+            items: options.items || [],
+            collapsible: options.collapsible !== false,
+            defaultCollapsed: options.defaultCollapsed || false,
+            ...options
+        };
+        this.collapsed = this.options.defaultCollapsed;
+    }
+
+    render() {
+        const sidebar = document.createElement('aside');
+        sidebar.className = 'wb-sidebar';
+        if (this.collapsed) sidebar.classList.add('wb-sidebar--collapsed');
+
+        // Logo/Header
+        const header = document.createElement('div');
+        header.className = 'wb-sidebar__header';
+
+        if (this.options.logoImage) {
+            const logoImg = document.createElement('img');
+            logoImg.src = this.options.logoImage;
+            logoImg.alt = 'Logo';
+            logoImg.className = 'wb-sidebar__logo-image';
+            header.appendChild(logoImg);
+        } else {
+            const logoText = document.createElement('h2');
+            logoText.className = 'wb-sidebar__logo';
+            logoText.textContent = this.options.logo;
+            header.appendChild(logoText);
+        }
+
+        // Collapse toggle button
+        if (this.options.collapsible) {
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'wb-sidebar__toggle';
+            toggleBtn.innerHTML = '☰';
+            toggleBtn.addEventListener('click', () => this.toggleSidebar(sidebar));
+            header.appendChild(toggleBtn);
+        }
+
+        sidebar.appendChild(header);
+
+        // Navigation items
+        const nav = document.createElement('nav');
+        nav.className = 'wb-sidebar__nav';
+
+        this.options.items.forEach(item => {
+            if (item.separator) {
+                const separator = document.createElement('div');
+                separator.className = 'wb-sidebar__separator';
+                if (item.label) {
+                    separator.textContent = item.label;
+                }
+                nav.appendChild(separator);
+            } else {
+                const link = document.createElement('a');
+                link.href = item.href || '#';
+                link.className = 'wb-sidebar__item';
+                if (item.active) link.classList.add('wb-sidebar__item--active');
+
+                if (item.icon) {
+                    const icon = document.createElement('span');
+                    icon.className = 'wb-sidebar__icon';
+                    icon.innerHTML = item.icon;
+                    link.appendChild(icon);
+                }
+
+                const text = document.createElement('span');
+                text.className = 'wb-sidebar__text';
+                text.textContent = item.title;
+                link.appendChild(text);
+
+                if (item.badge) {
+                    const badge = document.createElement('span');
+                    badge.className = 'wb-sidebar__badge';
+                    badge.textContent = item.badge;
+                    link.appendChild(badge);
+                }
+
+                link.addEventListener('click', (e) => {
+                    if (item.onClick) {
+                        e.preventDefault();
+                        item.onClick(e);
+                    }
+                    // Update active state
+                    nav.querySelectorAll('.wb-sidebar__item').forEach(i => {
+                        i.classList.remove('wb-sidebar__item--active');
+                    });
+                    link.classList.add('wb-sidebar__item--active');
+                });
+
+                nav.appendChild(link);
+            }
+        });
+
+        sidebar.appendChild(nav);
+        return sidebar;
+    }
+
+    toggleSidebar(sidebar) {
+        this.collapsed = !this.collapsed;
+        sidebar.classList.toggle('wb-sidebar--collapsed');
+        // Trigger event for layout adjustments
+        const event = new CustomEvent('sidebarToggle', { detail: { collapsed: this.collapsed } });
+        document.dispatchEvent(event);
+    }
+}
+
+class Card {
+    constructor(options = {}) {
+        this.options = {
+            title: options.title || '',
+            content: options.content || '',
+            footer: options.footer || null,
+            icon: options.icon || null,
+            value: options.value || null,
+            subtitle: options.subtitle || null,
+            actions: options.actions || [],
+            variant: options.variant || 'default', // default, info, success, warning, danger
+            ...options
+        };
+    }
+
+    render() {
+        const card = document.createElement('div');
+        card.className = `wb-card wb-card--${this.options.variant}`;
+
+        if (this.options.title || this.options.actions.length > 0) {
+            const header = document.createElement('div');
+            header.className = 'wb-card__header';
+
+            if (this.options.icon || this.options.title) {
+                const titleContainer = document.createElement('div');
+                titleContainer.className = 'wb-card__title-container';
+
+                if (this.options.icon) {
+                    const icon = document.createElement('span');
+                    icon.className = 'wb-card__icon';
+                    icon.innerHTML = this.options.icon;
+                    titleContainer.appendChild(icon);
+                }
+
+                if (this.options.title) {
+                    const title = document.createElement('h3');
+                    title.className = 'wb-card__title';
+                    title.textContent = this.options.title;
+                    titleContainer.appendChild(title);
+                }
+
+                header.appendChild(titleContainer);
+            }
+
+            if (this.options.actions.length > 0) {
+                const actionsContainer = document.createElement('div');
+                actionsContainer.className = 'wb-card__actions';
+
+                this.options.actions.forEach(action => {
+                    const btn = document.createElement('button');
+                    btn.className = 'wb-card__action-btn';
+                    btn.textContent = action.title;
+                    btn.addEventListener('click', action.onClick);
+                    actionsContainer.appendChild(btn);
+                });
+
+                header.appendChild(actionsContainer);
+            }
+
+            card.appendChild(header);
+        }
+
+        const body = document.createElement('div');
+        body.className = 'wb-card__body';
+
+        if (this.options.value !== null) {
+            const value = document.createElement('div');
+            value.className = 'wb-card__value';
+            value.textContent = this.options.value;
+            body.appendChild(value);
+
+            if (this.options.subtitle) {
+                const subtitle = document.createElement('div');
+                subtitle.className = 'wb-card__subtitle';
+                subtitle.textContent = this.options.subtitle;
+                body.appendChild(subtitle);
+            }
+        } else if (this.options.content) {
+            if (typeof this.options.content === 'string') {
+                body.innerHTML = this.options.content;
+            } else {
+                body.appendChild(this.options.content);
+            }
+        }
+
+        card.appendChild(body);
+
+        if (this.options.footer) {
+            const footer = document.createElement('div');
+            footer.className = 'wb-card__footer';
+            if (typeof this.options.footer === 'string') {
+                footer.innerHTML = this.options.footer;
+            } else {
+                footer.appendChild(this.options.footer);
+            }
+            card.appendChild(footer);
+        }
+
+        return card;
+    }
+}
+
+class DataTable {
+    constructor(options = {}) {
+        this.options = {
+            columns: options.columns || [],
+            data: options.data || [],
+            searchable: options.searchable !== false,
+            sortable: options.sortable !== false,
+            pagination: options.pagination !== false,
+            itemsPerPage: options.itemsPerPage || 10,
+            actions: options.actions || [],
+            selectable: options.selectable || false,
+            ...options
+        };
+        this.currentPage = 1;
+        this.sortColumn = null;
+        this.sortDirection = 'asc';
+        this.searchTerm = '';
+    }
+
+    render() {
+        const container = document.createElement('div');
+        container.className = 'wb-datatable';
+
+        // Search bar
+        if (this.options.searchable) {
+            const searchBar = document.createElement('div');
+            searchBar.className = 'wb-datatable__search';
+
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.placeholder = 'Search...';
+            searchInput.className = 'wb-datatable__search-input';
+            searchInput.addEventListener('input', (e) => {
+                this.searchTerm = e.target.value;
+                this.updateTable(container);
+            });
+
+            searchBar.appendChild(searchInput);
+            container.appendChild(searchBar);
+        }
+
+        // Table
+        const tableWrapper = document.createElement('div');
+        tableWrapper.className = 'wb-datatable__wrapper';
+
+        const table = document.createElement('table');
+        table.className = 'wb-datatable__table';
+
+        // Header
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+
+        if (this.options.selectable) {
+            const th = document.createElement('th');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.addEventListener('change', (e) => this.selectAll(e.target.checked, container));
+            th.appendChild(checkbox);
+            headerRow.appendChild(th);
+        }
+
+        this.options.columns.forEach(column => {
+            const th = document.createElement('th');
+            th.textContent = column.title;
+            if (this.options.sortable && column.sortable !== false) {
+                th.className = 'wb-datatable__th--sortable';
+                th.addEventListener('click', () => {
+                    this.sortBy(column.key, container);
+                });
+            }
+            headerRow.appendChild(th);
+        });
+
+        if (this.options.actions.length > 0) {
+            const th = document.createElement('th');
+            th.textContent = 'Actions';
+            headerRow.appendChild(th);
+        }
+
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        // Body
+        const tbody = document.createElement('tbody');
+        tbody.className = 'wb-datatable__tbody';
+        table.appendChild(tbody);
+
+        tableWrapper.appendChild(table);
+        container.appendChild(tableWrapper);
+
+        // Pagination
+        if (this.options.pagination) {
+            const pagination = document.createElement('div');
+            pagination.className = 'wb-datatable__pagination';
+            container.appendChild(pagination);
+        }
+
+        this.updateTable(container);
+        return container;
+    }
+
+    updateTable(container) {
+        const tbody = container.querySelector('.wb-datatable__tbody');
+        tbody.innerHTML = '';
+
+        // Filter data
+        let filteredData = this.options.data;
+        if (this.searchTerm) {
+            filteredData = filteredData.filter(row => {
+                return this.options.columns.some(column => {
+                    const value = row[column.key];
+                    return value && value.toString().toLowerCase().includes(this.searchTerm.toLowerCase());
+                });
+            });
+        }
+
+        // Sort data
+        if (this.sortColumn) {
+            filteredData.sort((a, b) => {
+                const aVal = a[this.sortColumn];
+                const bVal = b[this.sortColumn];
+                if (aVal < bVal) return this.sortDirection === 'asc' ? -1 : 1;
+                if (aVal > bVal) return this.sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+
+        // Paginate
+        const totalItems = filteredData.length;
+        const totalPages = Math.ceil(totalItems / this.options.itemsPerPage);
+        const startIndex = (this.currentPage - 1) * this.options.itemsPerPage;
+        const endIndex = startIndex + this.options.itemsPerPage;
+        const paginatedData = this.options.pagination ? filteredData.slice(startIndex, endIndex) : filteredData;
+
+        // Render rows
+        paginatedData.forEach((row, index) => {
+            const tr = document.createElement('tr');
+
+            if (this.options.selectable) {
+                const td = document.createElement('td');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.dataset.index = index;
+                td.appendChild(checkbox);
+                tr.appendChild(td);
+            }
+
+            this.options.columns.forEach(column => {
+                const td = document.createElement('td');
+                if (column.render) {
+                    const content = column.render(row[column.key], row);
+                    if (typeof content === 'string') {
+                        td.innerHTML = content;
+                    } else {
+                        td.appendChild(content);
+                    }
+                } else {
+                    td.textContent = row[column.key] || '';
+                }
+                tr.appendChild(td);
+            });
+
+            if (this.options.actions.length > 0) {
+                const td = document.createElement('td');
+                td.className = 'wb-datatable__actions';
+
+                this.options.actions.forEach(action => {
+                    const btn = document.createElement('button');
+                    btn.className = `wb-datatable__action-btn wb-datatable__action-btn--${action.variant || 'default'}`;
+                    btn.textContent = action.title;
+                    btn.addEventListener('click', () => action.onClick(row));
+                    td.appendChild(btn);
+                });
+
+                tr.appendChild(td);
+            }
+
+            tbody.appendChild(tr);
+        });
+
+        // Update pagination
+        if (this.options.pagination) {
+            this.updatePagination(container, totalPages);
+        }
+    }
+
+    updatePagination(container, totalPages) {
+        const pagination = container.querySelector('.wb-datatable__pagination');
+        pagination.innerHTML = '';
+
+        if (totalPages <= 1) return;
+
+        const prevBtn = document.createElement('button');
+        prevBtn.textContent = 'Previous';
+        prevBtn.disabled = this.currentPage === 1;
+        prevBtn.addEventListener('click', () => {
+            this.currentPage--;
+            this.updateTable(container);
+        });
+        pagination.appendChild(prevBtn);
+
+        const pageInfo = document.createElement('span');
+        pageInfo.textContent = `Page ${this.currentPage} of ${totalPages}`;
+        pagination.appendChild(pageInfo);
+
+        const nextBtn = document.createElement('button');
+        nextBtn.textContent = 'Next';
+        nextBtn.disabled = this.currentPage === totalPages;
+        nextBtn.addEventListener('click', () => {
+            this.currentPage++;
+            this.updateTable(container);
+        });
+        pagination.appendChild(nextBtn);
+    }
+
+    sortBy(key, container) {
+        if (this.sortColumn === key) {
+            this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            this.sortColumn = key;
+            this.sortDirection = 'asc';
+        }
+        this.updateTable(container);
+    }
+
+    selectAll(checked, container) {
+        const checkboxes = container.querySelectorAll('tbody input[type="checkbox"]');
+        checkboxes.forEach(cb => cb.checked = checked);
+    }
+}
+
+class AdminLayout {
+    constructor(options = {}) {
+        this.options = {
+            sidebar: options.sidebar || null,
+            content: options.content || [],
+            topBar: options.topBar || null,
+            ...options
+        };
+    }
+
+    render() {
+        const layout = document.createElement('div');
+        layout.className = 'wb-admin-layout';
+
+        // Sidebar
+        if (this.options.sidebar) {
+            const sidebar = this.options.sidebar.render();
+            layout.appendChild(sidebar);
+
+            // Listen for sidebar toggle to adjust layout
+            document.addEventListener('sidebarToggle', (e) => {
+                if (e.detail.collapsed) {
+                    layout.classList.add('wb-admin-layout--sidebar-collapsed');
+                } else {
+                    layout.classList.remove('wb-admin-layout--sidebar-collapsed');
+                }
+            });
+        }
+
+        // Main content area
+        const main = document.createElement('main');
+        main.className = 'wb-admin-main';
+
+        // Top bar
+        if (this.options.topBar) {
+            const topBar = document.createElement('div');
+            topBar.className = 'wb-admin-topbar';
+
+            if (typeof this.options.topBar === 'string') {
+                topBar.innerHTML = this.options.topBar;
+            } else if (this.options.topBar.render) {
+                topBar.appendChild(this.options.topBar.render());
+            } else {
+                topBar.appendChild(this.options.topBar);
+            }
+
+            main.appendChild(topBar);
+        }
+
+        // Content container
+        const contentContainer = document.createElement('div');
+        contentContainer.className = 'wb-admin-content';
+
+        this.options.content.forEach(section => {
+            if (section.render) {
+                contentContainer.appendChild(section.render());
+            } else {
+                contentContainer.appendChild(section);
+            }
+        });
+
+        main.appendChild(contentContainer);
+        layout.appendChild(main);
+
+        return layout;
+    }
+}
+
+class AdminSection {
+    constructor(title, options = {}) {
+        this.title = title;
+        this.options = {
+            id: options.id || null,
+            content: options.content || [],
+            actions: options.actions || [],
+            ...options
+        };
+    }
+
+    render() {
+        const section = document.createElement('section');
+        section.className = 'wb-admin-section';
+        if (this.options.id) section.id = this.options.id;
+
+        const header = document.createElement('div');
+        header.className = 'wb-admin-section__header';
+
+        const title = document.createElement('h2');
+        title.className = 'wb-admin-section__title';
+        title.textContent = this.title;
+        header.appendChild(title);
+
+        if (this.options.actions.length > 0) {
+            const actions = document.createElement('div');
+            actions.className = 'wb-admin-section__actions';
+
+            this.options.actions.forEach(action => {
+                const btn = document.createElement('button');
+                btn.className = `wb-button ${action.primary ? 'wb-button--primary' : ''}`;
+                btn.textContent = action.title;
+                btn.addEventListener('click', action.onClick);
+                actions.appendChild(btn);
+            });
+
+            header.appendChild(actions);
+        }
+
+        section.appendChild(header);
+
+        const content = document.createElement('div');
+        content.className = 'wb-admin-section__content';
+
+        this.options.content.forEach(item => {
+            if (item.render) {
+                content.appendChild(item.render());
+            } else if (typeof item === 'string') {
+                const p = document.createElement('p');
+                p.innerHTML = item;
+                content.appendChild(p);
+            } else {
+                content.appendChild(item);
+            }
+        });
+
+        section.appendChild(content);
+        return section;
+    }
+}
+
+class CardGrid {
+    constructor(options = {}) {
+        this.options = {
+            cards: options.cards || [],
+            columns: options.columns || 4,
+            ...options
+        };
+    }
+
+    render() {
+        const grid = document.createElement('div');
+        grid.className = 'wb-card-grid';
+        grid.style.gridTemplateColumns = `repeat(auto-fit, minmax(250px, 1fr))`;
+
+        this.options.cards.forEach(cardOptions => {
+            const card = new Card(cardOptions);
+            grid.appendChild(card.render());
+        });
+
+        return grid;
+    }
+}
+
+// ============================================
 // INJECT STYLES
 // ============================================
 
@@ -2679,6 +3280,504 @@ const styles = `
             font-size: 3.5rem;
         }
     }
+
+    /* ============================================ */
+    /* ADMIN PANEL STYLES */
+    /* ============================================ */
+
+    /* Admin Layout */
+    .wb-admin-layout {
+        display: flex;
+        min-height: 100vh;
+        background-color: var(--bg-alt);
+    }
+
+    .wb-admin-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        margin-left: 260px;
+        transition: margin-left 0.3s ease;
+    }
+
+    .wb-admin-layout--sidebar-collapsed .wb-admin-main {
+        margin-left: 70px;
+    }
+
+    /* Sidebar */
+    .wb-sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 260px;
+        height: 100vh;
+        background-color: var(--bg-color);
+        border-right: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        transition: width 0.3s ease;
+        z-index: 100;
+        overflow-y: auto;
+    }
+
+    .wb-sidebar--collapsed {
+        width: 70px;
+    }
+
+    .wb-sidebar__header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 70px;
+    }
+
+    .wb-sidebar__logo {
+        margin: 0;
+        font-size: 1.3rem;
+        color: var(--primary-color);
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .wb-sidebar--collapsed .wb-sidebar__logo {
+        display: none;
+    }
+
+    .wb-sidebar__logo-image {
+        max-width: 150px;
+        max-height: 40px;
+    }
+
+    .wb-sidebar--collapsed .wb-sidebar__logo-image {
+        max-width: 40px;
+    }
+
+    .wb-sidebar__toggle {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-color);
+        padding: 0.5rem;
+    }
+
+    .wb-sidebar__nav {
+        flex: 1;
+        padding: 1rem 0;
+    }
+
+    .wb-sidebar__item {
+        display: flex;
+        align-items: center;
+        padding: 0.875rem 1.5rem;
+        color: var(--text-color);
+        text-decoration: none;
+        transition: all 0.3s;
+        border-left: 3px solid transparent;
+        gap: 1rem;
+    }
+
+    .wb-sidebar__item:hover {
+        background-color: var(--bg-alt);
+        border-left-color: var(--primary-color);
+    }
+
+    .wb-sidebar__item--active {
+        background-color: var(--bg-alt);
+        border-left-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+
+    .wb-sidebar__icon {
+        font-size: 1.3rem;
+        min-width: 24px;
+        text-align: center;
+    }
+
+    .wb-sidebar__text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .wb-sidebar--collapsed .wb-sidebar__text {
+        display: none;
+    }
+
+    .wb-sidebar__badge {
+        margin-left: auto;
+        background-color: var(--primary-color);
+        color: white;
+        font-size: 0.75rem;
+        padding: 0.2rem 0.5rem;
+        border-radius: 10px;
+        min-width: 20px;
+        text-align: center;
+    }
+
+    .wb-sidebar--collapsed .wb-sidebar__badge {
+        display: none;
+    }
+
+    .wb-sidebar__separator {
+        padding: 1rem 1.5rem 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .wb-sidebar--collapsed .wb-sidebar__separator {
+        padding: 1rem 0.5rem;
+        text-align: center;
+    }
+
+    /* Admin Top Bar */
+    .wb-admin-topbar {
+        background-color: var(--bg-color);
+        border-bottom: 1px solid var(--border-color);
+        padding: 1rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 70px;
+    }
+
+    /* Admin Content */
+    .wb-admin-content {
+        flex: 1;
+        padding: 2rem;
+    }
+
+    /* Admin Section */
+    .wb-admin-section {
+        margin-bottom: 2rem;
+    }
+
+    .wb-admin-section__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+    }
+
+    .wb-admin-section__title {
+        margin: 0;
+        font-size: 1.5rem;
+        color: var(--text-color);
+    }
+
+    .wb-admin-section__actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .wb-admin-section__content {
+        background-color: var(--bg-color);
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow);
+    }
+
+    /* Card Component */
+    .wb-card {
+        background-color: var(--bg-color);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        transition: all 0.3s;
+    }
+
+    .wb-card:hover {
+        box-shadow: var(--shadow-hover);
+    }
+
+    .wb-card--info {
+        border-left: 4px solid #3498db;
+    }
+
+    .wb-card--success {
+        border-left: 4px solid #2ecc71;
+    }
+
+    .wb-card--warning {
+        border-left: 4px solid #f39c12;
+    }
+
+    .wb-card--danger {
+        border-left: 4px solid #e74c3c;
+    }
+
+    .wb-card__header {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .wb-card__title-container {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .wb-card__icon {
+        font-size: 1.5rem;
+    }
+
+    .wb-card__title {
+        margin: 0;
+        font-size: 1.1rem;
+        color: var(--text-color);
+    }
+
+    .wb-card__actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .wb-card__action-btn {
+        background: none;
+        border: 1px solid var(--border-color);
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        cursor: pointer;
+        color: var(--text-color);
+        transition: all 0.3s;
+        font-size: 0.875rem;
+    }
+
+    .wb-card__action-btn:hover {
+        background-color: var(--bg-alt);
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+
+    .wb-card__body {
+        padding: 1.5rem;
+    }
+
+    .wb-card__value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .wb-card__subtitle {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+    }
+
+    .wb-card__footer {
+        padding: 1rem 1.5rem;
+        background-color: var(--bg-alt);
+        font-size: 0.875rem;
+        color: var(--text-muted);
+    }
+
+    /* Card Grid */
+    .wb-card-grid {
+        display: grid;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    /* DataTable */
+    .wb-datatable {
+        background-color: var(--bg-color);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .wb-datatable__search {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .wb-datatable__search-input {
+        width: 100%;
+        max-width: 400px;
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: 0.875rem;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+    }
+
+    .wb-datatable__search-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+    }
+
+    .wb-datatable__wrapper {
+        overflow-x: auto;
+    }
+
+    .wb-datatable__table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .wb-datatable__table thead {
+        background-color: var(--bg-alt);
+    }
+
+    .wb-datatable__table th {
+        padding: 1rem 1.5rem;
+        text-align: left;
+        font-weight: 600;
+        color: var(--text-color);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .wb-datatable__th--sortable {
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .wb-datatable__th--sortable:hover {
+        background-color: var(--bg-color);
+    }
+
+    .wb-datatable__table td {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid var(--border-color);
+        color: var(--text-color);
+    }
+
+    .wb-datatable__table tbody tr:hover {
+        background-color: var(--bg-alt);
+    }
+
+    .wb-datatable__actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .wb-datatable__action-btn {
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.875rem;
+        transition: all 0.3s;
+    }
+
+    .wb-datatable__action-btn--default {
+        background-color: var(--bg-alt);
+        color: var(--text-color);
+    }
+
+    .wb-datatable__action-btn--default:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .wb-datatable__action-btn--danger {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+    .wb-datatable__action-btn--danger:hover {
+        background-color: #c0392b;
+    }
+
+    .wb-datatable__action-btn--success {
+        background-color: #2ecc71;
+        color: white;
+    }
+
+    .wb-datatable__action-btn--success:hover {
+        background-color: #27ae60;
+    }
+
+    .wb-datatable__pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        padding: 1rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .wb-datatable__pagination button {
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--border-color);
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .wb-datatable__pagination button:hover:not(:disabled) {
+        background-color: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    .wb-datatable__pagination button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .wb-datatable__pagination span {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+    }
+
+    /* Admin Panel Responsive */
+    @media (max-width: 1024px) {
+        .wb-admin-main {
+            margin-left: 0;
+        }
+
+        .wb-sidebar {
+            transform: translateX(-100%);
+        }
+
+        .wb-sidebar--mobile-open {
+            transform: translateX(0);
+        }
+
+        .wb-admin-content {
+            padding: 1rem;
+        }
+
+        .wb-card-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .wb-admin-section__header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .wb-datatable__table {
+            font-size: 0.875rem;
+        }
+
+        .wb-datatable__table th,
+        .wb-datatable__table td {
+            padding: 0.75rem 1rem;
+        }
+
+        .wb-card__value {
+            font-size: 2rem;
+        }
+    }
 `;
 
 // Inject styles
@@ -2688,23 +3787,29 @@ document.head.appendChild(styleSheet);
 
 // Export classes for use
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { 
-        Website, 
-        Page, 
-        NavBar, 
-        HeroBanner, 
-        Testimonials, 
-        Footer, 
-        FeatureGrid, 
-        PricingTable, 
-        ContactForm, 
-        Gallery, 
+    module.exports = {
+        Website,
+        Page,
+        NavBar,
+        HeroBanner,
+        Testimonials,
+        Footer,
+        FeatureGrid,
+        PricingTable,
+        ContactForm,
+        Gallery,
         CTA,
         TeamSection,
         TextSection,
         FAQ,
         StatsSection,
         VideoSection,
-        Timeline
+        Timeline,
+        Sidebar,
+        Card,
+        DataTable,
+        AdminLayout,
+        AdminSection,
+        CardGrid
     };
 }
